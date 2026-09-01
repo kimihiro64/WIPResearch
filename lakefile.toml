@@ -1,0 +1,26 @@
+name = "RobinBV"
+version = "0.1.0"
+defaultTargets = ["RobinBV", "Challenge", "Solution"]
+
+[[require]]
+name = "mathlib"
+path = "../Robin1984/.lake/packages/mathlib"
+
+[[require]]
+name = "Robin1984"
+path = "../Robin1984"
+
+[[require]]
+name = "BombieriVinogradov"
+path = "../bombieri-vinogradov"
+
+[[lean_lib]]
+name = "RobinBV"
+
+[[lean_lib]]
+name = "Challenge"
+roots = ["Challenge"]
+
+[[lean_lib]]
+name = "Solution"
+roots = ["Solution"]

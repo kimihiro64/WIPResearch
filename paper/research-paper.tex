@@ -1,0 +1,98 @@
+% SPDX-FileCopyrightText: 2026 Jonas Whidden
+% SPDX-License-Identifier: Apache-2.0 OR CC-BY-4.0
+
+\documentclass[11pt]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[nopatch=footnote]{microtype}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{linkblue}{HTML}{174A7E}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=linkblue,
+  citecolor=linkblue,
+  urlcolor=linkblue,
+  pdftitle={CA Distribution and Quadratic Robin Criteria},
+  pdfauthor={Jonas Whidden}
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{CA Distribution and Quadratic Robin Criteria}
+\author{Jonas Whidden}
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+An exploratory Lean 4 research repository for distribution estimates on the logarithmic prime-exponent measure of colossally abundant numbers and Robin-type criteria for quadratic and abelian number fields.
+\end{abstract}
+
+\maketitle
+
+\begin{center}
+\small
+Copyright \textcopyright\ 2026 Jonas Whidden. This paper is available under
+the \href{https://www.apache.org/licenses/LICENSE-2.0}{Apache License 2.0} or
+\href{https://creativecommons.org/licenses/by/4.0/}{CC BY 4.0}, at your option.
+\end{center}
+
+\section{Introduction}
+
+Explain the problem's significance, research audience, source relationship,
+and the exact scope of the result. Do not claim the project is complete while
+the public Challenge/Solution surface is still the template sentinel.
+
+\section{Statement of the problem}
+
+\textbf{Distribution of CA exponent mass and Robin criteria over number fields.} CA target: for every real theta with 0 <= theta < 1/2 and every real A >= 1, seek a constant C and a size threshold such that every sufficiently large colossally abundant N, with P its largest prime divisor, has total maximum reduced-residue-class discrepancy of the logarithmic measure sum\_\{p|N\} v\_p(N) log p through moduli q <= P\textasciicircum{}theta at most C P/(log P)\textasciicircum{}A, after primes dividing q are removed from the reference mass. Number-field target: for each fixed quadratic field K, determine whether ERH for zeta\_K is equivalent to an eventual strict upper bound sigma\_K(I) < exp(gamma) Res\_\{s=1\}(zeta\_K) Norm(I) log log Norm(I) for all sufficiently large nonzero integral ideals I, and identify the corrected constant or hypotheses if this candidate is false; then test the character-factorization mechanism for finite abelian extensions, including complex-valued character factors.
+
+Define every nonstandard object and state all quantifiers, hypotheses,
+endpoints, and exceptional cases.
+
+\section{Relation to the literature}
+
+Give a precise source and prior-formalization account. Distinguish direct
+formalization, adaptation, independent proof, background, and original work.
+
+\section{Proof architecture}
+
+Describe the mathematical reductions and how they compose. Replace this
+scaffold with the actual proof, not a development chronology.
+
+\section{Formalization and verification}
+
+Map each headline theorem to its Lean declaration. Describe dependency pins,
+the Challenge/Solution trust boundary, kernel checks, Comparator/NanoDa replay,
+and any exact finite certificates or computations.
+
+\section{Limitations and review status}
+
+State known divergences, omitted material, automation use, and the review that
+actually occurred. Mechanical checks are not independent expert review.
+
+\section*{Acknowledgements}
+
+Credit mathematical sources, libraries, tools, contributors, and reviewers.
+
+\begin{thebibliography}{9}
+
+\bibitem{PrimarySource}
+Replace with the complete primary-source citation.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,11 @@
+import RobinBV.CA.Definitions.Distribution
+import RobinBV.CA.Helpers.LayerPartition
+import RobinBV.Mathlib
+import RobinBV.NumberField.Definitions.RobinCriterion
+
+/-!
+# Public library root
+
+This module exports the exact exploratory targets and the first proved
+structural reduction. Neither headline target is claimed as a theorem.
+-/

@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this formalization, cite the repository and its mathematical sources."
+type: software
+title: "CA Distribution and Quadratic Robin Criteria"
+authors:
+  - family-names: "Whidden"
+    given-names: "Jonas"
+abstract: >-
+  An exploratory Lean 4 research repository for distribution estimates on the logarithmic prime-exponent measure of colossally abundant numbers and Robin-type criteria for quadratic and abelian number fields.
+license: Apache-2.0
+repository-code: "https://github.com/kimihiro64/robin-bv-explorations"
+url: "https://github.com/kimihiro64/robin-bv-explorations"
+keywords:
+  - "Lean 4"
+  - "formalized mathematics"

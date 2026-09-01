@@ -1,0 +1,21 @@
+/.cache/
+/.lake/
+/docbuild/.lake/
+/.mypy_cache/
+/.pytest_cache/
+/.ruff_cache/
+/.venv/
+/paper/build/
+/tmp/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Local research and AI working layer. These paths must never be tracked.
+/.agents/
+/.research/
+/.codex/
+/AGENTS.md
+/PLANS.md
+/AI_HANDOFF.md
+/ACTIVE_PROOF_STATE.md
