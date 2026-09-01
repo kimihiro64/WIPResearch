@@ -30,6 +30,14 @@ noncomputable def idealCALocalFactor
       (q : Real) ^ e) /
     (((q : Real) ^ e) ^ epsilon)
 
+/-- The multiplier relating the local CA factors at exponents `e` and
+`e + 1`. -/
+noncomputable def idealCALocalStepRatio
+    (epsilon : Real) (q e : Nat) : Real :=
+  ((Finset.univ.sum fun j : Fin (e + 2) => (q : Real) ^ j.val) /
+      (Finset.univ.sum fun j : Fin (e + 1) => (q : Real) ^ j.val)) /
+    ((q : Real) ^ (1 + epsilon))
+
 /-- The CA objective attached to an exponent profile on a fixed finite set of
 prime ideals. -/
 noncomputable def idealCAProfileObjective
