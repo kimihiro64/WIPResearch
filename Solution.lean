@@ -8,8 +8,10 @@ declaration below has exactly the same statement as its counterpart in
 `Challenge.lean` and uses only the permitted axioms.
 -/
 
-theorem RobinBV.ca_mass_layer_decomposition (n q : Nat) (a : ZMod q) :
-    RobinBV.CA.logPrimeExponentMass n q a =
-      RobinBV.CA.firstLayerLogPrimeMass n q a +
-        RobinBV.CA.repeatedLayerLogPrimeMass n q a := by
-  exact RobinBV.CA.logPrimeExponentMass_eq_firstLayer_add_repeatedLayer n q a
+theorem RobinBV.ca_mass_layer_decomposition
+    {alpha : Type*} [DecidableEq alpha]
+    (events : Finset alpha) (layer : alpha -> Nat) (mass : alpha -> Real) :
+    (∑ e ∈ events, mass e) =
+      (∑ e ∈ events.filter (fun e => layer e = 1), mass e) +
+        ∑ e ∈ events.filter (fun e => layer e ≠ 1), mass e := by
+  rw [Finset.sum_filter_add_sum_filter_not]
