@@ -7,6 +7,7 @@ import RobinBV.NumberField.Proof.IdealAbundancyEulerProduct
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
 import RobinBV.NumberField.Proof.IdealCAObjective
 import RobinBV.NumberField.Proof.IdealDivisorEulerProduct
+import RobinBV.NumberField.Proof.IdealLcmPacket
 
 /-!
 # Public library root
