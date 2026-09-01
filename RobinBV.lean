@@ -2,6 +2,7 @@ import RobinBV.CA.Definitions.Distribution
 import RobinBV.CA.Helpers.LayerPartition
 import RobinBV.Mathlib
 import RobinBV.NumberField.Definitions.RobinCriterion
+import RobinBV.NumberField.Proof.IdealAbundancyEulerProduct
 import RobinBV.NumberField.Proof.IdealDivisorEulerProduct
 
 /-!
