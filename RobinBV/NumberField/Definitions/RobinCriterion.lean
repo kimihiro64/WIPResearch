@@ -48,17 +48,47 @@ def EventualIdealRobinBound (kappa : Real) : Prop :=
             Real.log (Real.log (Ideal.absNorm
               (I : Ideal (NumberField.RingOfIntegers K)) : Real))
 
+/-- Eventual ideal Robin bound with a correction at the critical ERH scale.
+The correction in abundancy is `C / sqrt(log Norm(I))`, hence the divisor-sum
+correction is `C * Norm(I) / sqrt(log Norm(I))`. -/
+def EventualIdealRobinBoundWithCriticalCorrection
+    (kappa correction : Real) : Prop :=
+  Exists fun X : Nat =>
+    forall I : nonZeroDivisors
+        (Ideal (NumberField.RingOfIntegers K)),
+      X < Ideal.absNorm
+          (I : Ideal (NumberField.RingOfIntegers K)) ->
+        (idealDivisorSum K I : Real) <
+          Real.exp Real.eulerMascheroniConstant * kappa *
+              Ideal.absNorm
+                (I : Ideal (NumberField.RingOfIntegers K)) *
+              Real.log (Real.log (Ideal.absNorm
+                (I : Ideal (NumberField.RingOfIntegers K)) : Real)) +
+            correction * Ideal.absNorm
+              (I : Ideal (NumberField.RingOfIntegers K)) /
+                Real.sqrt (Real.log (Ideal.absNorm
+                  (I : Ideal (NumberField.RingOfIntegers K)) : Real))
+
+/-- There is a nonnegative field-dependent correction for which the eventual
+critical-scale ideal Robin bound holds. -/
+def CriticalScaleIdealRobinBound (kappa : Real) : Prop :=
+  Exists fun correction : Real =>
+    And (0 <= correction)
+      (EventualIdealRobinBoundWithCriticalCorrection K kappa correction)
+
 /-- `K` has degree two over the rationals. -/
 def IsQuadratic : Prop := Module.finrank Rat K = 2
 
 /--
-Schema for the candidate quadratic-field Robin criterion.
+Schema for the critical-scale quadratic-field Robin criterion.
 
 This is a research target, not a proved equivalence. The two analytic inputs
 are parameters so that no unavailable Dedekind-zeta residue or zero predicate
-is hidden inside the definition.
+is hidden inside the definition. The bare exact bound remains available as
+`EventualIdealRobinBound`; the criterion uses the field-dependent correction
+suggested by the critical-line error scale.
 -/
 def QuadraticRobinCriterion (dedekindERH : Prop) (kappa : Real) : Prop :=
-  IsQuadratic K → (dedekindERH ↔ EventualIdealRobinBound K kappa)
+  IsQuadratic K -> (dedekindERH <-> CriticalScaleIdealRobinBound K kappa)
 
 end RobinBV.NumberField
