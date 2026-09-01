@@ -6,7 +6,8 @@
     "RobinBV.ideal_eq_prod_primeFactors_pow",
     "RobinBV.ideal_absNorm_eq_prod_primeFactors_pow",
     "RobinBV.ideal_primeFactor_norm_is_primePower",
-    "RobinBV.ideal_divisor_norm_sum_eq_prod_geometric"
+    "RobinBV.ideal_divisor_norm_sum_eq_prod_geometric",
+    "RobinBV.ideal_abundancy_eq_prod_local"
   ],
   "definition_names": [],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],

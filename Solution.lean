@@ -80,3 +80,50 @@ theorem RobinBV.ideal_divisor_norm_sum_eq_prod_geometric
       (I : Ideal (NumberField.RingOfIntegers K))
   next => simp [hDvd]
   next => simp [hDvd]
+
+theorem RobinBV.ideal_abundancy_eq_prod_local
+    {K : Type*} [Field K] [NumberField K]
+    (I : nonZeroDivisors
+      (Ideal (NumberField.RingOfIntegers K)))
+    [DecidablePred (fun J : Ideal (NumberField.RingOfIntegers K) =>
+      Dvd.dvd J (I : Ideal (NumberField.RingOfIntegers K)))] :
+    ((Finset.sum
+        (Ideal.finite_setOfPred_absNorm_le
+          (Ideal.absNorm
+            (I : Ideal (NumberField.RingOfIntegers K)))).toFinset
+        (fun J =>
+          if Dvd.dvd J (I : Ideal (NumberField.RingOfIntegers K)) then
+            Ideal.absNorm J
+          else 0) : Nat) : Real) /
+        (Ideal.absNorm
+          (I : Ideal (NumberField.RingOfIntegers K)) : Real) =
+      Finset.univ.prod
+        (fun P : {P : Ideal (NumberField.RingOfIntegers K) //
+            Membership.mem
+              (normalizedFactors
+                (I : Ideal (NumberField.RingOfIntegers K))).toFinset P} =>
+          (Finset.univ.sum
+            (fun j : Fin (Multiset.count P.val
+                (normalizedFactors
+                  (I : Ideal (NumberField.RingOfIntegers K))) + 1) =>
+              (Ideal.absNorm P.val : Real) ^ j.val)) /
+            ((Ideal.absNorm P.val : Real) ^
+              Multiset.count P.val
+                (normalizedFactors
+                  (I : Ideal (NumberField.RingOfIntegers K))))) := by
+  classical
+  have h := RobinBV.NumberField.idealAbundancy_eq_prod_local I
+  unfold RobinBV.NumberField.idealAbundancy
+    RobinBV.NumberField.idealDivisorSum
+    RobinBV.NumberField.idealsUpToNorm at h
+  convert h using 1
+  apply congrArg (fun x : Real => x /
+    (Ideal.absNorm
+      (I : Ideal (NumberField.RingOfIntegers K)) : Real))
+  apply congrArg (fun n : Nat => (n : Real))
+  apply Finset.sum_congr rfl
+  intro J _hJ
+  by_cases hDvd : Dvd.dvd J
+      (I : Ideal (NumberField.RingOfIntegers K))
+  next => simp [hDvd]
+  next => simp [hDvd]

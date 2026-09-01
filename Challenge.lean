@@ -84,4 +84,38 @@ theorem ideal_divisor_norm_sum_eq_prod_geometric
               Ideal.absNorm P.val ^ j.val)) := by
   sorry
 
+/-- Ideal abundancy is the product of its local prime-ideal geometric factors
+divided by the corresponding norm powers. -/
+theorem ideal_abundancy_eq_prod_local
+    {K : Type*} [Field K] [NumberField K]
+    (I : nonZeroDivisors
+      (Ideal (NumberField.RingOfIntegers K)))
+    [DecidablePred (fun J : Ideal (NumberField.RingOfIntegers K) =>
+      Dvd.dvd J (I : Ideal (NumberField.RingOfIntegers K)))] :
+    ((Finset.sum
+        (Ideal.finite_setOfPred_absNorm_le
+          (Ideal.absNorm
+            (I : Ideal (NumberField.RingOfIntegers K)))).toFinset
+        (fun J =>
+          if Dvd.dvd J (I : Ideal (NumberField.RingOfIntegers K)) then
+            Ideal.absNorm J
+          else 0) : Nat) : Real) /
+        (Ideal.absNorm
+          (I : Ideal (NumberField.RingOfIntegers K)) : Real) =
+      Finset.univ.prod
+        (fun P : {P : Ideal (NumberField.RingOfIntegers K) //
+            Membership.mem
+              (normalizedFactors
+                (I : Ideal (NumberField.RingOfIntegers K))).toFinset P} =>
+          (Finset.univ.sum
+            (fun j : Fin (Multiset.count P.val
+                (normalizedFactors
+                  (I : Ideal (NumberField.RingOfIntegers K))) + 1) =>
+              (Ideal.absNorm P.val : Real) ^ j.val)) /
+            ((Ideal.absNorm P.val : Real) ^
+              Multiset.count P.val
+                (normalizedFactors
+                  (I : Ideal (NumberField.RingOfIntegers K))))) := by
+  sorry
+
 end RobinBV
