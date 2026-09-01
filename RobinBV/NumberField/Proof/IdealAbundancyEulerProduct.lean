@@ -31,7 +31,7 @@ private theorem cast_idealDivisorSum_eq_prod_geometric
   norm_cast
   exact idealDivisorSum_eq_prod_geometric I
 
-private theorem cast_absNorm_eq_prod_primeFactors_pow
+theorem cast_absNorm_eq_prod_primeFactors_pow
     (I : nonZeroDivisors
       (Ideal (_root_.NumberField.RingOfIntegers K))) :
     (Ideal.absNorm
