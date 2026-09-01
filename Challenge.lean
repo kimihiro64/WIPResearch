@@ -56,4 +56,32 @@ theorem ideal_primeFactor_norm_is_primePower
             Nat.Prime p /\ Ideal.absNorm P = p ^ n := by
   sorry
 
+/-- The finite sum of the norms of all ideal divisors factors into independent
+local geometric sums over the canonical prime-ideal support. -/
+theorem ideal_divisor_norm_sum_eq_prod_geometric
+    {K : Type*} [Field K] [NumberField K]
+    (I : nonZeroDivisors
+      (Ideal (NumberField.RingOfIntegers K)))
+    [DecidablePred (fun J : Ideal (NumberField.RingOfIntegers K) =>
+      Dvd.dvd J (I : Ideal (NumberField.RingOfIntegers K)))] :
+    Finset.sum
+        (Ideal.finite_setOfPred_absNorm_le
+          (Ideal.absNorm
+            (I : Ideal (NumberField.RingOfIntegers K)))).toFinset
+        (fun J =>
+          if Dvd.dvd J (I : Ideal (NumberField.RingOfIntegers K)) then
+            Ideal.absNorm J
+          else 0) =
+      Finset.univ.prod
+        (fun P : {P : Ideal (NumberField.RingOfIntegers K) //
+            Membership.mem
+              (normalizedFactors
+                (I : Ideal (NumberField.RingOfIntegers K))).toFinset P} =>
+          Finset.univ.sum
+            (fun j : Fin (Multiset.count P.val
+                (normalizedFactors
+                  (I : Ideal (NumberField.RingOfIntegers K))) + 1) =>
+              Ideal.absNorm P.val ^ j.val)) := by
+  sorry
+
 end RobinBV
