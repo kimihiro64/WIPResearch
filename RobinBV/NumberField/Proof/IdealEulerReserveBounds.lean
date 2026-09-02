@@ -98,6 +98,97 @@ theorem idealLcmTowerReserve_le_two_mul_sum
             (Nat.log (Ideal.absNorm P) B + 1)) := by
       rw [Finset.mul_sum]
 
+/-- The first omitted reciprocal power lies below the reciprocal packet
+frontier. -/
+theorem firstOmittedIdealPower_lt_inv_frontier
+    {q B : Nat} (hq : 1 < q) (hqB : q <= B) :
+    (Inv.inv (q : Real)) ^ (Nat.log q B + 1) <
+      Inv.inv (B : Real) := by
+  have hBPosNat : 0 < B := lt_of_lt_of_le (Nat.zero_lt_one.trans hq) hqB
+  have hPowNat : B < q ^ (Nat.log q B + 1) := by
+    simpa [Nat.succ_eq_add_one] using Nat.lt_pow_succ_log_self hq B
+  have hBPos : (0 : Real) < B := by exact_mod_cast hBPosNat
+  have hPowReal : (B : Real) < (q : Real) ^ (Nat.log q B + 1) := by
+    exact_mod_cast hPowNat
+  have hReciprocal := one_div_lt_one_div_of_lt hBPos hPowReal
+  simpa [one_div, inv_pow] using hReciprocal
+
+/-- Every selected first omitted reciprocal power is bounded by the reciprocal
+square of its prime-ideal norm. -/
+theorem firstOmittedIdealPower_le_inv_sq
+    {q B : Nat} (hq : 1 < q) (hqB : q <= B) :
+    (Inv.inv (q : Real)) ^ (Nat.log q B + 1) <=
+      (Inv.inv (q : Real)) ^ (2 : Nat) := by
+  have hLogPos : 0 < Nat.log q B := Nat.log_pos hq hqB
+  have hInvNonneg : 0 <= Inv.inv (q : Real) := by positivity
+  have hInvOne : Inv.inv (q : Real) <= 1 := by
+    have hqReal : (1 : Real) <= q := by exact_mod_cast hq.le
+    simpa [one_div] using
+      (one_div_le_one_div_of_le (by norm_num : (0 : Real) < 1) hqReal)
+  exact pow_le_pow_of_le_one hInvNonneg hInvOne (by omega)
+
+/-- Splitting at square-root norm reduces the first-omitted-power sum to a
+low-norm cardinal term and a high-norm reciprocal-square tail. -/
+theorem idealFirstOmittedPowerSum_le_sqrt_split
+    (K : Type*) [Field K] [NumberField K] (B : Nat) :
+    (primeIdealsUpToNorm K B).sum
+        (fun P =>
+          (Inv.inv (Ideal.absNorm P : Real)) ^
+            (Nat.log (Ideal.absNorm P) B + 1)) <=
+      (((primeIdealsUpToNorm K B).filter
+          (fun P => Ideal.absNorm P <= Nat.sqrt B)).card : Real) *
+        Inv.inv (B : Real) +
+      ((primeIdealsUpToNorm K B).filter
+          (fun P => Not (Ideal.absNorm P <= Nat.sqrt B))).sum
+        (fun P => (Inv.inv (Ideal.absNorm P : Real)) ^ (2 : Nat)) := by
+  classical
+  let S := primeIdealsUpToNorm K B
+  let low := S.filter (fun P => Ideal.absNorm P <= Nat.sqrt B)
+  let high := S.filter (fun P => Not (Ideal.absNorm P <= Nat.sqrt B))
+  let f := fun P : Ideal (NumberField.RingOfIntegers K) =>
+    (Inv.inv (Ideal.absNorm P : Real)) ^
+      (Nat.log (Ideal.absNorm P) B + 1)
+  let g := fun P : Ideal (NumberField.RingOfIntegers K) =>
+    (Inv.inv (Ideal.absNorm P : Real)) ^ (2 : Nat)
+  have hPartition : S.sum f = low.sum f + high.sum f := by
+    unfold low high
+    rw [Finset.sum_filter_add_sum_filter_not]
+  have hLow : low.sum f <= (low.card : Real) * Inv.inv (B : Real) := by
+    calc
+      low.sum f <= low.sum (fun _P => Inv.inv (B : Real)) := by
+        apply Finset.sum_le_sum
+        intro P hP
+        have hPS : Membership.mem S P := (Finset.mem_filter.mp hP).1
+        exact (firstOmittedIdealPower_lt_inv_frontier
+          (one_lt_absNorm_of_mem_primeIdealsUpToNorm K hPS)
+          (absNorm_le_of_mem_primeIdealsUpToNorm K hPS)).le
+      _ = (low.card : Real) * Inv.inv (B : Real) := by simp
+  have hHigh : high.sum f <= high.sum g := by
+    apply Finset.sum_le_sum
+    intro P hP
+    have hPS : Membership.mem S P := (Finset.mem_filter.mp hP).1
+    exact firstOmittedIdealPower_le_inv_sq
+      (one_lt_absNorm_of_mem_primeIdealsUpToNorm K hPS)
+      (absNorm_le_of_mem_primeIdealsUpToNorm K hPS)
+  change S.sum f <= (low.card : Real) * Inv.inv (B : Real) + high.sum g
+  rw [hPartition]
+  exact add_le_add hLow hHigh
+
+/-- The tower reserve itself is controlled by the square-root norm split. -/
+theorem idealLcmTowerReserve_le_two_mul_sqrt_split
+    (K : Type*) [Field K] [NumberField K] (B : Nat) :
+    idealLcmTowerReserve K B <=
+      2 * (
+        (((primeIdealsUpToNorm K B).filter
+            (fun P => Ideal.absNorm P <= Nat.sqrt B)).card : Real) *
+          Inv.inv (B : Real) +
+        ((primeIdealsUpToNorm K B).filter
+            (fun P => Not (Ideal.absNorm P <= Nat.sqrt B))).sum
+          (fun P => (Inv.inv (Ideal.absNorm P : Real)) ^ (2 : Nat))) := by
+  exact (idealLcmTowerReserve_le_two_mul_sum K B).trans
+    (mul_le_mul_of_nonneg_left
+      (idealFirstOmittedPowerSum_le_sqrt_split K B) (by norm_num))
+
 end
 
 end RobinBV.NumberField
