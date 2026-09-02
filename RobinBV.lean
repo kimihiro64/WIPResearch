@@ -9,6 +9,7 @@ import RobinBV.NumberField.Proof.IdealCALocalThreshold
 import RobinBV.NumberField.Proof.IdealCAObjective
 import RobinBV.NumberField.Proof.IdealDivisorEulerProduct
 import RobinBV.NumberField.Proof.IdealEulerReserve
+import RobinBV.NumberField.Proof.IdealEulerReserveBounds
 import RobinBV.NumberField.Proof.IdealLcmPacket
 import RobinBV.NumberField.Proof.IdealNicolasTransfer
 import RobinBV.NumberField.Proof.QuadraticDedekindERH
