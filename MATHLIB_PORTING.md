@@ -40,8 +40,10 @@ Replace the scaffold row when the first real candidate module is created.
 
 | Project module | Proposed Mathlib path | Readiness | Upstream reference |
 | --- | --- | --- | --- |
+| `RobinBV.Mathlib.Algebra.QuadraticAlgebra.Discriminant` | `Mathlib/Algebra/QuadraticAlgebra/Discriminant.lean` | project-verified | Computes the discriminant of the canonical basis of a quadratic algebra, including the odd-discriminant integer specialization |
 | `RobinBV.Mathlib.NumberTheory.NumberField.Ideal.Factorization` | `Mathlib/NumberTheory/NumberField/Ideal/Factorization.lean` | project-verified | Extends the distinct-factor calculation already used internally by `Ideal.quotientEquivPiFactors` |
 | `RobinBV.Mathlib.NumberTheory.NumberField.QuadraticCharacter` | `Mathlib/NumberTheory/NumberField/QuadraticCharacter.lean` | project-verified | Constructs the primitive self-dual Jacobi character of an odd fundamental discriminant and proves its sign-dependent parity |
+| `RobinBV.Mathlib.NumberTheory.NumberField.QuadraticDiscriminant` | `Mathlib/NumberTheory/NumberField/QuadraticDiscriminant.lean` | project-verified | Constructs the canonical quadratic field of an odd fundamental discriminant and proves that its signed number-field discriminant is the original parameter |
 
 Readiness should be one of: `extracting`, `project-verified`, `mathlib-ready`,
 `submitted`, or `upstreamed`. A module is `mathlib-ready` only after it has an

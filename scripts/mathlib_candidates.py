@@ -60,7 +60,11 @@ def mathlib_candidate_failures(
             failures.append(
                 f"{module}: Mathlib candidate imports non-Mathlib dependency {dependency}"
             )
-    body = "\n".join(line for line in code.splitlines() if not line.lstrip().startswith("import "))
+    body = "\n".join(
+        line
+        for line in code.splitlines()
+        if re.match(r"^\s*(?:public\s+)?import\s+", line) is None
+    )
     if re.search(rf"\b{re.escape(namespace)}\b", body):
         failures.append(
             f"{module}: Mathlib candidate body references project namespace {namespace}"

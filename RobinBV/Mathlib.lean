@@ -1,5 +1,5 @@
 import RobinBV.Mathlib.NumberTheory.NumberField.Ideal.Factorization
-import RobinBV.Mathlib.NumberTheory.NumberField.QuadraticCharacter
+import RobinBV.Mathlib.NumberTheory.NumberField.QuadraticDiscriminant
 
 /-!
 # Mathlib candidate facade

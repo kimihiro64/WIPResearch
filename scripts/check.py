@@ -31,7 +31,9 @@ DISCOVERY_LEAN: Final[re.Pattern[str]] = re.compile(
     r"(?m)^\s*#(?:check|print|eval|reduce)\b|"
     r"\b(?:exact|apply|simp|rw|aesop)\?|\blibrary_search\b"
 )
-BROAD_IMPORT: Final[re.Pattern[str]] = re.compile(r"(?m)^\s*import\s+(?:Batteries|Mathlib)\s*$")
+BROAD_IMPORT: Final[re.Pattern[str]] = re.compile(
+    r"(?m)^\s*(?:public\s+)?import\s+(?:Batteries|Mathlib)\s*$"
+)
 
 
 class CheckFailure(RuntimeError):  # noqa: N818
@@ -156,7 +158,9 @@ def strip_lean_comments(source: str) -> str:
 
 def lean_imports(code: str) -> list[str]:
     """Return direct import names from a Lean source."""
-    return re.findall(r"(?m)^\s*import\s+([A-Za-z0-9_'.]+)\s*$", code)
+    return re.findall(
+        r"(?m)^\s*(?:public\s+)?import\s+([A-Za-z0-9_'.]+)\s*$", code
+    )
 
 
 def check_lean_sources(root: Path) -> None:
