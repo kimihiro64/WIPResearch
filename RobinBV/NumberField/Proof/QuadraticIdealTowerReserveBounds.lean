@@ -1,6 +1,8 @@
 import RobinBV.NumberField.Proof.IdealEulerReserveBounds
 import RobinBV.NumberField.Proof.QuadraticPrimeIdealNormMultiplicity
 import Mathlib.Analysis.PSeries
+import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
+import Mathlib.Analysis.Real.Sqrt
 
 /-!
 # Quadratic ideal-lcm tower reserve bounds
@@ -13,6 +15,9 @@ reciprocal-square tail. The resulting tower reserve is at most
 -/
 
 namespace RobinBV.NumberField
+
+open Asymptotics
+open Filter
 
 noncomputable section
 
@@ -291,6 +296,118 @@ theorem quadraticIdealLcmTowerReserve_le_twelve_inv_sqrt
           (2 * ((m : Real) + 1) * Inv.inv (B : Real) +
             2 * Inv.inv (m : Real)) := hEnvelope
     _ <= 12 * Inv.inv (m : Real) := by linarith
+
+private theorem rpow_isLittleO_rpow_atTop_of_lt
+    {a b : Real} (hab : a < b) :
+    (fun x : Real => x ^ a) =o[(atTop : Filter Real)]
+      (fun x : Real => x ^ b) := by
+  apply isLittleO_of_tendsto'
+  next =>
+    filter_upwards [eventually_gt_atTop (0 : Real)] with x hx
+    intro hZero
+    exact False.elim ((Real.rpow_pos_of_pos hx b).ne' hZero)
+  next =>
+    have hLimit := tendsto_rpow_neg_atTop (sub_pos.mpr hab)
+    exact hLimit.congr' ((eventually_gt_atTop (0 : Real)).mono
+      (fun x hx => by
+        calc
+          x ^ (-(b - a)) = x ^ (a - b) := by
+            congr 1
+            ring
+          _ = x ^ a / x ^ b := Real.rpow_sub hx a b))
+
+/-- The floor-square-root bound implies a comparable bound using the ordinary
+real square root. -/
+theorem quadraticIdealLcmTowerReserve_le_twentyFour_inv_realSqrt
+    (D : NumberField.OddFundamentalDiscriminant) {B : Nat}
+    (hB : 0 < B) :
+    idealLcmTowerReserve D.QuadraticField B <=
+      24 * Inv.inv (Real.sqrt (B : Real)) := by
+  let m := Nat.sqrt B
+  have hmPosNat : 0 < m := (Nat.sqrt_pos).2 hB
+  have hmPos : (0 : Real) < m := by exact_mod_cast hmPosNat
+  have hSqrtPos : 0 < Real.sqrt (B : Real) := by
+    exact Real.sqrt_pos.2 (by exact_mod_cast hB)
+  have hUpperNat : B <= (m + 1) ^ (2 : Nat) := by
+    simpa [pow_two] using (Nat.lt_succ_sqrt B).le
+  have hUpperReal : (B : Real) <= ((m + 1 : Nat) : Real) ^ (2 : Nat) := by
+    exact_mod_cast hUpperNat
+  have hSqrtLeSucc : Real.sqrt (B : Real) <= (m : Real) + 1 := by
+    rw [Real.sqrt_le_iff]
+    apply And.intro
+    next => positivity
+    next =>
+      push_cast at hUpperReal
+      nlinarith
+  have hmOne : (1 : Real) <= m := by exact_mod_cast hmPosNat
+  have hSqrtLeTwo : Real.sqrt (B : Real) <= 2 * (m : Real) := by
+    linarith
+  have hLeftCancel :
+      Inv.inv (m : Real) *
+          ((m : Real) * Real.sqrt (B : Real)) =
+        Real.sqrt (B : Real) := by
+    field_simp
+  have hRightCancel :
+      (2 * Inv.inv (Real.sqrt (B : Real))) *
+          ((m : Real) * Real.sqrt (B : Real)) =
+        2 * (m : Real) := by
+    field_simp
+  have hInv :
+      Inv.inv (m : Real) <= 2 * Inv.inv (Real.sqrt (B : Real)) := by
+    by_contra hNot
+    have hGt :
+        2 * Inv.inv (Real.sqrt (B : Real)) < Inv.inv (m : Real) :=
+      lt_of_not_ge hNot
+    have hMul := mul_lt_mul_of_pos_right hGt (mul_pos hmPos hSqrtPos)
+    rw [hLeftCancel, hRightCancel] at hMul
+    linarith
+  have hTower := quadraticIdealLcmTowerReserve_le_twelve_inv_sqrt D hB
+  change idealLcmTowerReserve D.QuadraticField B <=
+    24 * Inv.inv (Real.sqrt (B : Real))
+  calc
+    idealLcmTowerReserve D.QuadraticField B <=
+        12 * Inv.inv (m : Real) := hTower
+    _ <= 24 * Inv.inv (Real.sqrt (B : Real)) := by linarith
+
+/-- For every real exponent below the critical half exponent, the quadratic
+ideal-lcm tower reserve is little-o of `B ^ (-b)`. -/
+theorem quadraticIdealLcmTowerReserve_isLittleO_rpow
+    (D : NumberField.OddFundamentalDiscriminant) {b : Real}
+    (hb : b < (1 : Real) / 2) :
+    (fun B : Nat => idealLcmTowerReserve D.QuadraticField B) =o[
+      (atTop : Filter Nat)]
+      (fun B : Nat => (B : Real) ^ (-b)) := by
+  have hBigO :
+      (fun B : Nat => idealLcmTowerReserve D.QuadraticField B) =O[
+        (atTop : Filter Nat)]
+        (fun B : Nat => (B : Real) ^ (-((1 : Real) / 2))) := by
+    apply IsBigO.of_bound 24
+    filter_upwards [eventually_ge_atTop 1] with B hB
+    have hBPos : 0 < B := by omega
+    have hReserveNonneg := idealLcmTowerReserve_nonneg D.QuadraticField B
+    have hReserveBound :=
+      quadraticIdealLcmTowerReserve_le_twentyFour_inv_realSqrt D hBPos
+    have hEq :
+        Inv.inv (Real.sqrt (B : Real)) =
+          (B : Real) ^ (-((1 : Real) / 2)) := by
+      have hNonneg : (0 : Real) <= B := by positivity
+      simpa [Real.sqrt_eq_rpow] using
+        (Real.rpow_neg hNonneg ((1 : Real) / 2)).symm
+    rw [Real.norm_of_nonneg hReserveNonneg]
+    rw [Real.norm_of_nonneg (Real.rpow_nonneg (by positivity) _)]
+    rw [<- hEq]
+    exact hReserveBound
+  have hPowersReal :
+      (fun x : Real => x ^ (-((1 : Real) / 2))) =o[
+        (atTop : Filter Real)]
+        (fun x : Real => x ^ (-b)) :=
+    rpow_isLittleO_rpow_atTop_of_lt (by linarith)
+  have hPowersNat :
+      (fun B : Nat => (B : Real) ^ (-((1 : Real) / 2))) =o[
+        (atTop : Filter Nat)]
+        (fun B : Nat => (B : Real) ^ (-b)) :=
+    hPowersReal.comp_tendsto tendsto_natCast_atTop_atTop
+  exact hBigO.trans_isLittleO hPowersNat
 
 end
 
