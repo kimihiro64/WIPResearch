@@ -12,6 +12,7 @@ import RobinBV.NumberField.Proof.IdealEulerReserve
 import RobinBV.NumberField.Proof.IdealLcmPacket
 import RobinBV.NumberField.Proof.IdealNicolasTransfer
 import RobinBV.NumberField.Proof.QuadraticDedekindERH
+import RobinBV.NumberField.Proof.QuadraticDedekindPrimeSide
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroMass
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroSymmetry
 import RobinBV.NumberField.Proof.QuadraticDedekindZetaZeros
