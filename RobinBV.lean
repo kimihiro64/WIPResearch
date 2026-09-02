@@ -10,6 +10,8 @@ import RobinBV.NumberField.Proof.IdealDivisorEulerProduct
 import RobinBV.NumberField.Proof.IdealEulerReserve
 import RobinBV.NumberField.Proof.IdealLcmPacket
 import RobinBV.NumberField.Proof.IdealNicolasTransfer
+import RobinBV.NumberField.Proof.QuadraticDedekindERH
+import RobinBV.NumberField.Proof.QuadraticDedekindZeroMass
 import RobinBV.NumberField.Proof.QuadraticDedekindZetaZeros
 import RobinBV.NumberField.Proof.QuadraticLZeroMassEvaluation
 
