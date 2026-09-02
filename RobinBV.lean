@@ -9,7 +9,7 @@ import RobinBV.NumberField.Proof.IdealDivisorEulerProduct
 import RobinBV.NumberField.Proof.IdealEulerReserve
 import RobinBV.NumberField.Proof.IdealLcmPacket
 import RobinBV.NumberField.Proof.IdealNicolasTransfer
-import RobinBV.NumberField.Proof.QuadraticLFiniteOrderInput
+import RobinBV.NumberField.Proof.QuadraticLZeroMass
 
 /-!
 # Public library root
