@@ -1,9 +1,8 @@
 import Mathlib.Logic.Equiv.Sum
 import PrimeNumberTheoremAnd.Mathlib.NumberTheory.LSeries.RiemannXiDivisorZeros
-import Robin1984.NicolasLandau.XiZeroConstant
+import RobinBV.NumberField.Proof.QuadraticDedekindRightmostZero
 import RobinBV.NumberField.Proof.CriticalCorrectionBridge
 import RobinBV.NumberField.Proof.QuadraticDedekindERH
-import RobinBV.NumberField.Proof.QuadraticDedekindZetaZeros
 import RobinBV.NumberField.Proof.QuadraticLZeroMass
 import RobinBV.NumberField.Proof.QuadraticLZeroMassEvaluation
 

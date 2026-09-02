@@ -1,4 +1,5 @@
 import Mathlib.Analysis.Meromorphic.Order
+import RobinBV.NumberField.Proof.QuadraticDedekindRightmostZero
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroSymmetry
 
 /-!
@@ -155,6 +156,42 @@ theorem quadraticDedekindZetaLogDeriv_simplePoleLimit_Ioi
       exact (Complex.ofReal_ne_zero.mpr (ne_of_gt hu)) huZero
   refine Exists.intro c (And.intro hc ?_)
   simpa [Function.comp_def] using hLimit.comp hRay
+
+theorem exists_rightmost_quadraticDedekindZeta_logDeriv_pole_of_not_ERH
+    (D : NumberField.OddFundamentalDiscriminant)
+    (hNotERH : Not (QuadraticDedekindZetaERH D)) :
+    Exists fun rhoMax : Complex =>
+      And (quadraticDedekindZetaContinuation D rhoMax = 0)
+        (And ((1 / 2 : Real) < rhoMax.re)
+          (And (rhoMax.re < 1)
+            (And
+              (forall v : Real, 0 < v ->
+                Not (quadraticDedekindZetaContinuation D
+                  (rhoMax + (v : Complex)) = 0))
+              (Exists fun c : Complex => And (Not (c = 0))
+                (Tendsto
+                  (fun u : Real => (u : Complex) *
+                    logDeriv (quadraticDedekindZetaContinuation D)
+                      (rhoMax + (u : Complex)))
+                  (nhdsWithin 0 (Set.Ioi 0)) (nhds c)))))) := by
+  choose rho hZero hHalf hOne using
+    exists_quadraticDedekindZeta_zero_re_gt_half_of_not_ERH D hNotERH
+  choose rhoMax hMaxZero hMaxHalf hMaxOne hMaxIm hRight using
+    exists_rightmost_horizontal_quadraticDedekindZeta_zero
+      D hZero hHalf hOne
+  have hMaxNeOne : Not (rhoMax = 1) := by
+    intro hEq
+    subst rhoMax
+    norm_num at hMaxOne
+  choose c hc hLimit using
+    quadraticDedekindZetaLogDeriv_simplePoleLimit_Ioi
+      D hMaxZero hMaxNeOne
+  exact Exists.intro rhoMax
+    (And.intro hMaxZero
+      (And.intro hMaxHalf
+        (And.intro hMaxOne
+          (And.intro hRight
+            (Exists.intro c (And.intro hc hLimit))))))
 
 end
 
