@@ -1,4 +1,5 @@
 import RobinBV.NumberField.Proof.IdealNicolasTransfer
+import RobinBV.NumberField.Proof.CriticalCorrectionBridge
 import RobinBV.NumberField.Proof.QuadraticIdealHeightLossBounds
 
 /-!
@@ -143,6 +144,101 @@ theorem not_frequently_neg_quadraticIdealNicolas_of_eventually_nonpos_robin
   apply hRobinPositive
   filter_upwards [hRobinNonpos] with B hB
   exact not_lt_of_ge hB
+
+/-- A positive ideal Robin log margin is a literal strict violation of the
+normalized ideal Robin inequality for the complete lcm packet. -/
+theorem idealLcmPacket_robin_violation_of_pos_logMargin
+    (K : Type*) [Field K] [NumberField K]
+    {kappa : Real} (hKappa : 0 < kappa) (B : Nat)
+    (hHeight : 1 < Real.log
+      (Ideal.absNorm (idealLcmPacket K B) : Real))
+    (hMargin : 0 < idealLcmPacketRobinLogMargin K kappa B) :
+    Real.exp Real.eulerMascheroniConstant * kappa *
+        Ideal.absNorm (idealLcmPacket K B) *
+        Real.log (Real.log
+          (Ideal.absNorm (idealLcmPacket K B) : Real)) <
+      (idealDivisorSum K (idealLcmPacketNonZero K B) : Real) := by
+  have hNormNat : 0 < Ideal.absNorm (idealLcmPacket K B) :=
+    Ideal.absNorm_pos_of_nonZeroDivisors (idealLcmPacketNonZero K B)
+  have hNorm :
+      (0 : Real) < Ideal.absNorm (idealLcmPacket K B) := by
+    exact_mod_cast hNormNat
+  have hLogHeight : 0 < Real.log (Real.log
+      (Ideal.absNorm (idealLcmPacket K B) : Real)) :=
+    Real.log_pos hHeight
+  have hAbundancy := idealAbundancy_pos (idealLcmPacketNonZero K B)
+  have hLog :
+      Real.eulerMascheroniConstant + Real.log kappa +
+          Real.log (Real.log
+            (Real.log (Ideal.absNorm (idealLcmPacket K B) : Real))) <
+        Real.log (idealAbundancy K (idealLcmPacketNonZero K B)) := by
+    unfold idealLcmPacketRobinLogMargin at hMargin
+    linarith
+  have hExp := Real.exp_lt_exp.mpr hLog
+  rw [Real.exp_add, Real.exp_add, Real.exp_log hKappa,
+    Real.exp_log hLogHeight, Real.exp_log hAbundancy] at hExp
+  have hMultiplied := mul_lt_mul_of_pos_right hExp hNorm
+  calc
+    Real.exp Real.eulerMascheroniConstant * kappa *
+        Ideal.absNorm (idealLcmPacket K B) *
+        Real.log (Real.log
+          (Ideal.absNorm (idealLcmPacket K B) : Real)) =
+      (Real.exp Real.eulerMascheroniConstant * kappa *
+        Real.log (Real.log
+          (Ideal.absNorm (idealLcmPacket K B) : Real))) *
+        Ideal.absNorm (idealLcmPacket K B) := by ring
+    _ < idealAbundancy K (idealLcmPacketNonZero K B) *
+        Ideal.absNorm (idealLcmPacket K B) := hMultiplied
+    _ = (idealDivisorSum K (idealLcmPacketNonZero K B) : Real) := by
+      unfold idealAbundancy
+      change
+        (idealDivisorSum K (idealLcmPacketNonZero K B) : Real) /
+            (Ideal.absNorm (idealLcmPacket K B) : Real) *
+            Ideal.absNorm (idealLcmPacket K B) =
+          (idealDivisorSum K (idealLcmPacketNonZero K B) : Real)
+      field_simp [hNorm.ne']
+
+/-- Frequent off-critical negative Nicolas excursions therefore produce
+arbitrarily large literal violations on quadratic ideal lcm packets. -/
+theorem frequently_quadraticIdealLcmPacket_robin_violation_of_frequently_neg_nicolas
+    (D : NumberField.OddFundamentalDiscriminant) {kappa b c : Real}
+    (hKappa : 0 < kappa)
+    (hb : b < (1 : Real) / 2)
+    (hc : 0 < c)
+    (hThetaLinear : Filter.Eventually
+      (fun B : Nat =>
+        (B : Real) / 2 <= idealChebyshevTheta D.QuadraticField B)
+      atTop)
+    (hNegativeOscillation : Filter.Frequently
+      (fun B : Nat =>
+        idealNicolasLogMertensOscillation D.QuadraticField kappa B <=
+          -c * (B : Real) ^ (-b))
+      atTop) :
+    Filter.Frequently
+      (fun B : Nat =>
+        Real.exp Real.eulerMascheroniConstant * kappa *
+            Ideal.absNorm (idealLcmPacket D.QuadraticField B) *
+            Real.log (Real.log (Ideal.absNorm
+              (idealLcmPacket D.QuadraticField B) : Real)) <
+          (idealDivisorSum D.QuadraticField
+            (idealLcmPacketNonZero D.QuadraticField B) : Real))
+      atTop := by
+  have hPositiveMargin :=
+    frequently_pos_quadraticIdealRobinMargin_of_frequently_neg_nicolas
+      D hKappa hb hc hThetaLinear hNegativeOscillation
+  have hHeight : Filter.Eventually
+      (fun B : Nat => 1 < Real.log (Ideal.absNorm
+        (idealLcmPacket D.QuadraticField B) : Real)) atTop := by
+    filter_upwards [hThetaLinear, eventually_ge_atTop 4] with B hTheta hB
+    rw [log_absNorm_idealLcmPacket]
+    have hThetaPsi := idealChebyshevTheta_le_psi D.QuadraticField B
+    have hCast : (4 : Real) <= B := by exact_mod_cast hB
+    linarith
+  have hJoint := hPositiveMargin.and_eventually hHeight
+  apply hJoint.mono
+  intro B hData
+  exact idealLcmPacket_robin_violation_of_pos_logMargin
+    D.QuadraticField hKappa B hData.2 hData.1
 
 end
 
