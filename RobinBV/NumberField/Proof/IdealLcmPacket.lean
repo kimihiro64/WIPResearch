@@ -80,6 +80,64 @@ theorem count_normalizedFactors_idealLcmPacket
       Nat.log (Ideal.absNorm P) B := by
   rw [normalizedFactors_idealLcmPacket, count_idealLcmPacketFactors K B hP]
 
+theorem absNorm_le_of_mem_primeIdealsUpToNorm
+    {B : Nat} {P : Ideal (NumberField.RingOfIntegers K)}
+    (hP : Membership.mem (primeIdealsUpToNorm K B) P) :
+    Ideal.absNorm P <= B := by
+  classical
+  have hIdeal := (Finset.mem_filter.mp hP).1
+  simpa only [idealsUpToNorm, Set.Finite.mem_toFinset,
+    Set.mem_ofPred_eq] using hIdeal
+
+theorem one_lt_absNorm_of_mem_primeIdealsUpToNorm
+    {B : Nat} {P : Ideal (NumberField.RingOfIntegers K)}
+    (hP : Membership.mem (primeIdealsUpToNorm K B) P) :
+    1 < Ideal.absNorm P := by
+  have hPrime := mem_primeIdealsUpToNorm_prime K hP
+  have hNormZero : Not (Ideal.absNorm P = 0) :=
+    Ideal.absNorm_eq_zero_iff.not.mpr hPrime.ne_zero
+  have hNormOne : Not (Ideal.absNorm P = 1) :=
+    Ideal.absNorm_eq_one_iff.not.mpr
+      (Ideal.isPrime_of_prime hPrime).ne_top
+  omega
+
+private theorem mem_idealLcmPacketFactors_iff
+    (B : Nat) {P : Ideal (NumberField.RingOfIntegers K)} :
+    Membership.mem (idealLcmPacketFactors K B) P <->
+      Membership.mem (primeIdealsUpToNorm K B) P := by
+  constructor
+  next =>
+    intro hP
+    rw [idealLcmPacketFactors, Multiset.mem_bind] at hP
+    choose Q hQ hReplicate using hP
+    rw [Multiset.mem_replicate] at hReplicate
+    have hQFinset : Membership.mem (primeIdealsUpToNorm K B) Q := by
+      simpa using hQ
+    exact hReplicate.2.symm.subst hQFinset
+  next =>
+    intro hP
+    rw [idealLcmPacketFactors, Multiset.mem_bind]
+    apply Exists.intro P
+    apply And.intro
+    next => simpa using hP
+    next =>
+      rw [Multiset.mem_replicate]
+      apply And.intro
+      next =>
+        exact Nat.ne_of_gt (Nat.log_pos
+          (one_lt_absNorm_of_mem_primeIdealsUpToNorm K hP)
+          (absNorm_le_of_mem_primeIdealsUpToNorm K hP))
+      next => rfl
+
+/-- The packet support is exactly the set of every prime ideal whose absolute
+norm is at most the packet frontier. -/
+theorem support_normalizedFactors_idealLcmPacket (B : Nat) :
+    (normalizedFactors (idealLcmPacket K B)).toFinset =
+      primeIdealsUpToNorm K B := by
+  rw [normalizedFactors_idealLcmPacket]
+  ext P
+  rw [Multiset.mem_toFinset, mem_idealLcmPacketFactors_iff]
+
 /-- The logarithmic height of the ideal lcm packet is exactly the complete
 prime-ideal Chebyshev sum at the same frontier. -/
 theorem log_absNorm_idealLcmPacket (B : Nat) :
