@@ -23,6 +23,7 @@ import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
 import RobinBV.NumberField.Proof.QuadraticDedekindWeightedError
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroMass
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroSymmetry
+import RobinBV.NumberField.Proof.QuadraticDedekindLogDerivativePole
 import RobinBV.NumberField.Proof.QuadraticDedekindZetaZeros
 import RobinBV.NumberField.Proof.QuadraticLZeroMassEvaluation
 
