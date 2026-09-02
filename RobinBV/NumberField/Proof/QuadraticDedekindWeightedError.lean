@@ -308,6 +308,54 @@ def quadraticRobinZeroKernelScale (n : Nat) (x : Real) : Real :=
               ((1 / 2 : Real) - (n : Real))) *
           Inv.inv ((Real.log x) ^ (3 : Nat))))
 
+def quadraticRobinZeroKernelCorrection (x : Real) : Real :=
+  1 + Inv.inv (Real.log x) + 4 * Inv.inv (Real.log x) ^ (2 : Nat)
+
+theorem quadraticRobinZeroKernelScale_one_eq (x : Real) :
+    quadraticRobinZeroKernelScale 1 x =
+      x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x) *
+        quadraticRobinZeroKernelCorrection x := by
+  unfold quadraticRobinZeroKernelScale
+  unfold quadraticRobinZeroKernelCorrection
+  norm_num
+  ring
+
+theorem tendsto_quadraticRobinZeroKernelCorrection :
+    Filter.Tendsto quadraticRobinZeroKernelCorrection Filter.atTop
+      (nhds 1) := by
+  have hInv : Filter.Tendsto
+      (fun x : Real => Inv.inv (Real.log x)) Filter.atTop (nhds 0) :=
+    tendsto_inv_atTop_zero.comp Real.tendsto_log_atTop
+  unfold quadraticRobinZeroKernelCorrection
+  convert (tendsto_const_nhds.add hInv).add
+    ((hInv.pow 2).const_mul 4) using 1 <;> norm_num
+
+theorem eventually_quadraticRobinZeroKernelScale_one_le
+    {epsilon : Real} (hEpsilon : 0 < epsilon) :
+    Filter.Eventually (fun x : Real =>
+      quadraticRobinZeroKernelScale 1 x <=
+        (1 + epsilon) *
+          (x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x)))
+      Filter.atTop := by
+  have hCorrection : Filter.Eventually (fun x : Real =>
+      quadraticRobinZeroKernelCorrection x < 1 + epsilon) Filter.atTop :=
+    (tendsto_order.1 tendsto_quadraticRobinZeroKernelCorrection).2
+      (1 + epsilon) (by linarith)
+  filter_upwards [hCorrection,
+    Filter.eventually_gt_atTop (1 : Real)] with x hCorr hx
+  rw [quadraticRobinZeroKernelScale_one_eq x]
+  have hBase : 0 <=
+      x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x) := by
+    exact mul_nonneg (Real.rpow_nonneg (by positivity) _)
+      (inv_nonneg.mpr (Real.log_nonneg (le_of_lt hx)))
+  calc
+    x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x) *
+        quadraticRobinZeroKernelCorrection x <=
+      x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x) *
+        (1 + epsilon) := mul_le_mul_of_nonneg_left hCorr.le hBase
+    _ = (1 + epsilon) *
+        (x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x)) := by ring
+
 theorem norm_tsum_quadraticDedekind_robinZeroKernel_div_le
     (D : NumberField.OddFundamentalDiscriminant)
     (hFieldERH : QuadraticDedekindERH D)
@@ -350,6 +398,92 @@ theorem norm_tsum_quadraticDedekind_robinZeroKernel_div_le
       rw [tsum_mul_right]
     _ = quadraticDedekindZeroMass D * quadraticRobinZeroKernelScale n x := by
       rfl
+
+theorem eventually_norm_tsum_quadraticDedekind_robinZeroKernel_one_le
+    (D : NumberField.OddFundamentalDiscriminant)
+    (hFieldERH : QuadraticDedekindERH D)
+    {epsilon : Real} (hEpsilon : 0 < epsilon) :
+    Filter.Eventually (fun x : Real =>
+      norm (tsum (fun p : QuadraticDedekindZeroIndex D =>
+        Robin1984.robinZeroKernel 1 (quadraticDedekindZeroValue p) x /
+          quadraticDedekindZeroValue p)) <=
+        (quadraticDedekindZeroMass D + epsilon) *
+          (x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x)))
+      Filter.atTop := by
+  let Z := quadraticDedekindZeroMass D
+  have hZ : 0 <= Z := quadraticDedekindZeroMass_nonneg D
+  have hDelta : 0 < epsilon / (Z + 1) := by
+    exact div_pos hEpsilon (by linarith)
+  have hScale := eventually_quadraticRobinZeroKernelScale_one_le hDelta
+  filter_upwards [hScale,
+    Filter.eventually_gt_atTop (1 : Real)] with x hScale hx
+  have hKernel := norm_tsum_quadraticDedekind_robinZeroKernel_div_le
+    D hFieldERH (n := 1) (x := x) (by norm_num) hx
+  have hBase : 0 <=
+      x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x) := by
+    exact mul_nonneg (Real.rpow_nonneg (by positivity) _)
+      (inv_nonneg.mpr (Real.log_nonneg (le_of_lt hx)))
+  have hDen : 0 < Z + 1 := by linarith
+  have hFrac : Z / (Z + 1) <= 1 :=
+    (div_le_one hDen).2 (by linarith)
+  have hEpsFrac : epsilon * (Z / (Z + 1)) <= epsilon := by
+    simpa using mul_le_mul_of_nonneg_left hFrac hEpsilon.le
+  have hCoefficient : Z * (1 + epsilon / (Z + 1)) <= Z + epsilon := by
+    calc
+      Z * (1 + epsilon / (Z + 1)) =
+          Z + epsilon * (Z / (Z + 1)) := by ring
+      _ <= Z + epsilon := by linarith
+  calc
+    norm (tsum (fun p : QuadraticDedekindZeroIndex D =>
+      Robin1984.robinZeroKernel 1 (quadraticDedekindZeroValue p) x /
+        quadraticDedekindZeroValue p)) <=
+        Z * quadraticRobinZeroKernelScale 1 x := hKernel
+    _ <= Z * ((1 + epsilon / (Z + 1)) *
+        (x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x))) :=
+      mul_le_mul_of_nonneg_left hScale hZ
+    _ = (Z * (1 + epsilon / (Z + 1))) *
+        (x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x)) := by ring
+    _ <= (Z + epsilon) *
+        (x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x)) :=
+      mul_le_mul_of_nonneg_right hCoefficient hBase
+
+theorem quadraticCriticalKernelBase_eq
+    {x : Real} (hx : 0 <= x) :
+    x ^ (-(1 / 2 : Real)) * Inv.inv (Real.log x) =
+      1 / (Real.sqrt x * Real.log x) := by
+  rw [Real.rpow_neg hx, <- Real.sqrt_eq_rpow, one_div, mul_inv]
+
+theorem eventually_norm_tsum_quadraticDedekind_robinZeroKernel_one_le_div
+    (D : NumberField.OddFundamentalDiscriminant)
+    (hFieldERH : QuadraticDedekindERH D)
+    {epsilon : Real} (hEpsilon : 0 < epsilon) :
+    Filter.Eventually (fun x : Real =>
+      norm (tsum (fun p : QuadraticDedekindZeroIndex D =>
+        Robin1984.robinZeroKernel 1 (quadraticDedekindZeroValue p) x /
+          quadraticDedekindZeroValue p)) <=
+        (quadraticDedekindZeroMass D + epsilon) /
+          (Real.sqrt x * Real.log x)) Filter.atTop := by
+  have hBound :=
+    eventually_norm_tsum_quadraticDedekind_robinZeroKernel_one_le
+      D hFieldERH hEpsilon
+  filter_upwards [hBound,
+    Filter.eventually_gt_atTop (1 : Real)] with x hBound hx
+  rw [quadraticCriticalKernelBase_eq
+    (le_of_lt (lt_trans Real.zero_lt_one hx))] at hBound
+  simpa [div_eq_mul_inv] using hBound
+
+theorem eventually_norm_tsum_quadraticDedekind_robinZeroKernel_one_le_div_of_zetaERH
+    (D : NumberField.OddFundamentalDiscriminant)
+    (hZetaERH : QuadraticDedekindZetaERH D)
+    {epsilon : Real} (hEpsilon : 0 < epsilon) :
+    Filter.Eventually (fun x : Real =>
+      norm (tsum (fun p : QuadraticDedekindZeroIndex D =>
+        Robin1984.robinZeroKernel 1 (quadraticDedekindZeroValue p) x /
+          quadraticDedekindZeroValue p)) <=
+        (quadraticDedekindZeroMass D + epsilon) /
+          (Real.sqrt x * Real.log x)) Filter.atTop := by
+  exact eventually_norm_tsum_quadraticDedekind_robinZeroKernel_one_le_div
+    D ((quadraticDedekindZetaERH_iff_carrierERH D).1 hZetaERH) hEpsilon
 
 theorem quadraticDedekindWeightedErrorIntegral_eq_zero_sum_of_component_formulas
     (D : NumberField.OddFundamentalDiscriminant)
