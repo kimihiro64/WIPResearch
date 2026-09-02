@@ -36,13 +36,26 @@ theorem norm_quadraticDedekindMangoldtSequence_le
     apply Complex.ext
     next => simp
     next => simpa using quadraticDedekindMangoldtSequence_im D n
-  rw [hReal, norm_real, Real.norm_eq_abs,
+  rw [hReal, Complex.norm_real, Real.norm_eq_abs,
     abs_of_nonneg (quadraticDedekindMangoldtSequence_re_nonneg D n)]
-  unfold quadraticDedekindMangoldtSequence twistedMangoldtSequence
+  unfold quadraticDedekindMangoldtSequence
+    BombieriVinogradov.SiegelWalfisz.twistedMangoldtSequence
   rcases D.character_isQuadratic n with hZero | hOne | hNeg
-  next => rw [hZero]; simp [ArithmeticFunction.vonMangoldt_nonneg]
-  next => rw [hOne]; simp [ArithmeticFunction.vonMangoldt_nonneg]
-  next => rw [hNeg]; simp [ArithmeticFunction.vonMangoldt_nonneg]
+  next =>
+    rw [hZero]
+    have hLambda : 0 <= ArithmeticFunction.vonMangoldt n :=
+      ArithmeticFunction.vonMangoldt_nonneg
+    norm_num [Complex.add_re, Complex.mul_re]
+    linarith
+  next =>
+    rw [hOne]
+    norm_num [Complex.add_re, Complex.mul_re]
+    linarith
+  next =>
+    rw [hNeg]
+    have hLambda : 0 <= ArithmeticFunction.vonMangoldt n :=
+      ArithmeticFunction.vonMangoldt_nonneg
+    norm_num [Complex.add_re, Complex.mul_re] <;> linarith
 
 theorem quadraticDedekindMangoldtNormPartialSums_isBigO
     (D : NumberField.OddFundamentalDiscriminant) :
@@ -51,7 +64,7 @@ theorem quadraticDedekindMangoldtNormPartialSums_isBigO
         (fun k => norm (quadraticDedekindMangoldtSequence D k)))
       =O[atTop] (fun n : Nat => (n : Real) ^ (1 : Real)) := by
   let c : Real := 2 * (Real.log 4 + 4)
-  apply (IsBigOWith.of_bound c
+  apply (IsBigOWith.of_bound (c := c)
     (Eventually.of_forall fun n => ?_)).isBigO
   have hSumNonneg : 0 <= Finset.sum (Finset.Icc 1 n)
       (fun k => norm (quadraticDedekindMangoldtSequence D k)) :=
@@ -99,8 +112,16 @@ theorem quadraticDedekindChebyshevSum_re_le_two_psi
   have hReSum : (quadraticDedekindChebyshevSum D n).re =
       Finset.sum (Finset.Icc 1 n)
         (fun k => (quadraticDedekindMangoldtSequence D k).re) := by
-    unfold quadraticDedekindChebyshevSum
-    rw [map_sum]
+    have hAll : forall S : Finset Nat,
+        (S.sum fun k => quadraticDedekindMangoldtSequence D k).re =
+          S.sum fun k => (quadraticDedekindMangoldtSequence D k).re := by
+      intro S
+      induction S using Finset.induction_on with
+      | empty => simp
+      | @insert k S hk ih =>
+          rw [Finset.sum_insert hk, Finset.sum_insert hk,
+            Complex.add_re, ih]
+    exact hAll (Finset.Icc 1 n)
   have hLambdaSum :
       Finset.sum (Finset.Icc 1 n)
           (fun k => ArithmeticFunction.vonMangoldt k) =
@@ -124,7 +145,7 @@ theorem quadraticDedekindMellinStep_le_two_psi
     (D : NumberField.OddFundamentalDiscriminant) (t : Real) :
     quadraticDedekindMellinStep D t <= 2 * Chebyshev.psi t := by
   unfold quadraticDedekindMellinStep
-  rw [<- Chebyshev.psi_eq_psi_coe_floor t]
+  rw [Chebyshev.psi_eq_psi_coe_floor t]
   exact quadraticDedekindChebyshevSum_re_le_two_psi D (Nat.floor t)
 
 theorem quadraticDedekindLogDeriv_eq_psiMellin
@@ -138,6 +159,17 @@ theorem quadraticDedekindLogDeriv_eq_psiMellin
     (quadraticDedekindMangoldtSequence D)
     (r := (1 : Real)) (by norm_num) hs
     (quadraticDedekindMangoldtNormPartialSums_isBigO D)
+  have hPartial : forall t : Real,
+      Finset.sum (Finset.Icc 1 (Nat.floor t))
+          (quadraticDedekindMangoldtSequence D) =
+        (quadraticDedekindMellinStep D t : Complex) := by
+    intro t
+    change quadraticDedekindChebyshevSum D (Nat.floor t) =
+      ((quadraticDedekindChebyshevSum D (Nat.floor t)).re : Complex)
+    apply Complex.ext
+    next => simp
+    next =>
+      simpa using quadraticDedekindChebyshevSum_im D (Nat.floor t)
   calc
     -logDeriv (quadraticDedekindZetaContinuation D) s =
         LSeries (quadraticDedekindMangoldtSequence D) s :=
@@ -152,14 +184,13 @@ theorem quadraticDedekindLogDeriv_eq_psiMellin
       congr 1
       apply setIntegral_congr_fun measurableSet_Ioi
       intro t ht
-      congr 1
-      apply Complex.ext
-      next => rfl
-      next =>
-        simp only [map_sum, Complex.ofReal_im]
-        rw [Finset.sum_eq_zero]
-        intro k hk
-        exact quadraticDedekindMangoldtSequence_im D k
+      change
+        (Finset.sum (Finset.Icc 1 (Nat.floor t))
+            (quadraticDedekindMangoldtSequence D)) *
+            (t : Complex) ^ (-(s + 1)) =
+          (quadraticDedekindMellinStep D t : Complex) *
+            (t : Complex) ^ (-(s + 1))
+      rw [hPartial t]
 
 theorem quadraticDedekindPsiMellin_integrable
     (D : NumberField.OddFundamentalDiscriminant)
@@ -362,19 +393,28 @@ theorem quadraticDedekindPsiMellinContinuation_simplePoleLimit_Ioi
   have hShift : Tendsto (fun u : Real => rho + (u : Complex)) l
       (nhds rho) := by
     simpa using tendsto_const_nhds.add hU
-  have hInvAt : ContinuousAt (fun z : Complex => 1 / z) rho :=
-    continuousAt_const.div continuousAt_id hRhoZero
+  have hInvAt : ContinuousAt (fun z : Complex => Inv.inv z) rho := by
+    fun_prop
   have hInvShift : Tendsto
       (fun u : Real => Inv.inv (rho + (u : Complex))) l
       (nhds (Inv.inv rho)) := by
-    simpa [one_div] using hInvAt.tendsto.comp hShift
-  have hInvDenAt : ContinuousAt (fun z : Complex => 1 / (z - 1)) rho :=
-    continuousAt_const.div (continuousAt_id.sub continuousAt_const)
-      (sub_ne_zero.mpr hOne)
+    change Tendsto
+      (Function.comp (fun z : Complex => Inv.inv z)
+        (fun u : Real => rho + (u : Complex))) l
+      (nhds (Inv.inv rho))
+    exact hInvAt.tendsto.comp hShift
+  have hInvDenAt : ContinuousAt
+      (fun z : Complex => Inv.inv (z - 1)) rho := by
+    have hDen : Not (rho - 1 = 0) := sub_ne_zero.mpr hOne
+    fun_prop
   have hInvDen : Tendsto
       (fun u : Real => Inv.inv (rho + (u : Complex) - 1)) l
       (nhds (Inv.inv (rho - 1))) := by
-    simpa [one_div] using hInvDenAt.tendsto.comp hShift
+    change Tendsto
+      (Function.comp (fun z : Complex => Inv.inv (z - 1))
+        (fun u : Real => rho + (u : Complex))) l
+      (nhds (Inv.inv (rho - 1)))
+    exact hInvDenAt.tendsto.comp hShift
   have hMain : Tendsto (fun u : Real =>
       (-(u : Complex) *
         logDeriv (quadraticDedekindZetaContinuation D)

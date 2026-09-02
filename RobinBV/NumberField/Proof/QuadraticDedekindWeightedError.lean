@@ -23,6 +23,18 @@ def quadraticDedekindChebyshevStep
     (D : NumberField.OddFundamentalDiscriminant) (t : Real) : Real :=
   (quadraticDedekindChebyshevSum D (Nat.floor t)).re
 
+theorem quadraticDedekindChebyshevStep_eq_mellinStep
+    (D : NumberField.OddFundamentalDiscriminant) (t : Real) :
+    quadraticDedekindChebyshevStep D t =
+      quadraticDedekindMellinStep D t := by
+  rfl
+
+theorem quadraticDedekindPsiError_eq
+    (D : NumberField.OddFundamentalDiscriminant) (t : Real) :
+    quadraticDedekindPsiError D t =
+      quadraticDedekindChebyshevStep D t - t := by
+  rfl
+
 def quadraticCharacterChebyshevStep
     (D : NumberField.OddFundamentalDiscriminant) (t : Real) : Real :=
   (BombieriVinogradov.SiegelWalfisz.characterChebyshevSum
@@ -103,6 +115,36 @@ def quadraticDedekindWeightedErrorIntegral
   integral (volume.restrict (Ioi x)) fun t : Real =>
     (quadraticDedekindChebyshevStep D t - t) *
       Robin1984.robinRealWeight n t
+
+def quadraticDedekindNicolasTailKernel (t : Real) : Real :=
+  (1 / Real.log t + 1 / (Real.log t) ^ 2) / t ^ 2
+
+theorem quadraticDedekindRealWeight_one_eq_nicolasTailKernel
+    {t : Real} (ht : 1 < t) :
+    Robin1984.robinRealWeight 1 t =
+      quadraticDedekindNicolasTailKernel t := by
+  have htPos : 0 < t := lt_trans Real.zero_lt_one ht
+  unfold Robin1984.robinRealWeight quadraticDedekindNicolasTailKernel
+  norm_num [Real.rpow_neg htPos.le]
+  field_simp [htPos.ne', (Real.log_pos ht).ne']
+
+def quadraticDedekindNicolasJ
+    (D : NumberField.OddFundamentalDiscriminant) (x : Real) : Real :=
+  integral (volume.restrict (Ioi x)) fun t : Real =>
+    quadraticDedekindPsiError D t * quadraticDedekindNicolasTailKernel t
+
+theorem quadraticDedekindWeightedErrorIntegral_one_eq_nicolasJ
+    (D : NumberField.OddFundamentalDiscriminant)
+    {x : Real} (hx : 1 <= x) :
+    quadraticDedekindWeightedErrorIntegral D 1 x =
+      quadraticDedekindNicolasJ D x := by
+  unfold quadraticDedekindWeightedErrorIntegral
+    quadraticDedekindNicolasJ
+  apply integral_congr_ae
+  filter_upwards [ae_restrict_mem measurableSet_Ioi] with t ht
+  rw [quadraticDedekindPsiError_eq]
+  rw [quadraticDedekindRealWeight_one_eq_nicolasTailKernel
+    (lt_of_le_of_lt hx ht)]
 
 private theorem complex_t_mul_robinRealWeight_eq
     (n : Nat) {t : Real} (ht : 1 < t) :

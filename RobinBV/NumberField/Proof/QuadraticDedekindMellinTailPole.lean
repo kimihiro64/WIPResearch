@@ -166,10 +166,7 @@ theorem quadraticDedekindPsiMellinTailContinuation_three_simplePoleLimit_Ioi
     simpa using hU.mul hStartup
   refine Exists.intro c (And.intro hc ?_)
   have hTail := hFull.sub hStartupScaled
-  apply hTail.congr'
-  filter_upwards with u
-  unfold quadraticDedekindPsiMellinTailContinuation
-  ring
+  simpa only [quadraticDedekindPsiMellinTailContinuation, mul_sub, sub_zero] using hTail
 
 theorem exists_rightmost_quadraticDedekindPsiMellinTail_pole_of_not_ERH
     (D : NumberField.OddFundamentalDiscriminant)
