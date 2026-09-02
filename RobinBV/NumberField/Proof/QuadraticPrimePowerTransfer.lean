@@ -37,6 +37,48 @@ theorem quadraticMangoldt_square_sub_thetaSquare_eq
   rw [hCharacter]
   ring
 
+theorem quadraticPrimeIdealThetaSquareCoefficient_im
+    (D : NumberField.OddFundamentalDiscriminant) (n : Nat) :
+    (quadraticPrimeIdealThetaSquareCoefficient D n).im = 0 := by
+  unfold quadraticPrimeIdealThetaSquareCoefficient
+  rcases D.character_isQuadratic n with hZero | hOne | hNeg
+  next => rw [hZero]; simp
+  next => rw [hOne]; simp
+  next => rw [hNeg]; simp
+
+theorem quadraticPrimeIdealThetaSquareCoefficient_re_nonneg
+    (D : NumberField.OddFundamentalDiscriminant) (n : Nat) :
+    0 <= (quadraticPrimeIdealThetaSquareCoefficient D n).re := by
+  unfold quadraticPrimeIdealThetaSquareCoefficient
+  rcases D.character_isQuadratic n with hZero | hOne | hNeg
+  next => rw [hZero]; simp
+  next => rw [hOne]; simp
+  next =>
+    rw [hNeg]
+    simp [ArithmeticFunction.vonMangoldt_nonneg]
+
+theorem quadraticMangoldt_square_eq_thetaSquare_add
+    (D : NumberField.OddFundamentalDiscriminant) (n : Nat) :
+    quadraticDedekindMangoldtSequence D (n ^ (2 : Nat)) =
+      quadraticPrimeIdealThetaSquareCoefficient D n +
+        quadraticDedekindMangoldtSequence D n := by
+  have h := quadraticMangoldt_square_sub_thetaSquare_eq D n
+  linear_combination h
+
+theorem quadraticMangoldt_square_positive_decomposition
+    (D : NumberField.OddFundamentalDiscriminant) (n : Nat) :
+    And
+      (quadraticDedekindMangoldtSequence D (n ^ (2 : Nat)) =
+        quadraticPrimeIdealThetaSquareCoefficient D n +
+          quadraticDedekindMangoldtSequence D n)
+      (And
+        (0 <= (quadraticPrimeIdealThetaSquareCoefficient D n).re)
+        (0 <= (quadraticDedekindMangoldtSequence D n).re)) := by
+  exact And.intro (quadraticMangoldt_square_eq_thetaSquare_add D n)
+    (And.intro
+      (quadraticPrimeIdealThetaSquareCoefficient_re_nonneg D n)
+      (quadraticDedekindMangoldtSequence_re_nonneg D n))
+
 theorem quadraticMangoldt_square_gap_split
     (D : NumberField.OddFundamentalDiscriminant) {p : Nat}
     (hp : p.Prime) (hSplit : D.character p = 1) :
