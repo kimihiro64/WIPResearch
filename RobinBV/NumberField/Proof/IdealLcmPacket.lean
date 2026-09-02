@@ -80,6 +80,35 @@ theorem count_normalizedFactors_idealLcmPacket
       Nat.log (Ideal.absNorm P) B := by
   rw [normalizedFactors_idealLcmPacket, count_idealLcmPacketFactors K B hP]
 
+/-- The logarithmic height of the ideal lcm packet is exactly the complete
+prime-ideal Chebyshev sum at the same frontier. -/
+theorem log_absNorm_idealLcmPacket (B : Nat) :
+    Real.log (Ideal.absNorm (idealLcmPacket K B) : Real) =
+      idealChebyshevPsi K B := by
+  classical
+  rw [absNorm_idealLcmPacket]
+  have hCast :
+      (((primeIdealsUpToNorm K B).prod fun P =>
+          Ideal.absNorm P ^ Nat.log (Ideal.absNorm P) B : Nat) : Real) =
+        (primeIdealsUpToNorm K B).prod fun P =>
+          (Ideal.absNorm P : Real) ^ Nat.log (Ideal.absNorm P) B := by
+    simp
+  rw [hCast]
+  have hFactors : forall P,
+      Membership.mem (primeIdealsUpToNorm K B) P ->
+        Not (((Ideal.absNorm P : Real) ^
+          Nat.log (Ideal.absNorm P) B) = 0) := by
+    intro P hP
+    have hPrime := mem_primeIdealsUpToNorm_prime K hP
+    have hNormNat : Not (Ideal.absNorm P = 0) :=
+      Ideal.absNorm_eq_zero_iff.not.mpr hPrime.ne_zero
+    exact pow_ne_zero _ (Nat.cast_ne_zero.mpr hNormNat)
+  rw [Real.log_prod hFactors]
+  unfold idealChebyshevPsi
+  apply Finset.sum_congr rfl
+  intro P _hP
+  rw [Real.log_pow]
+
 end
 
 

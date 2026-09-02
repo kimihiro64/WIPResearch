@@ -29,6 +29,13 @@ def idealLcmPacket (B : Nat) :
   (primeIdealsUpToNorm K B).prod fun P =>
     P ^ Nat.log (Ideal.absNorm P) B
 
+/-- The prime-ideal Chebyshev function, with every prime ideal counted
+separately and every prime-power layer up to the frontier included. -/
+def idealChebyshevPsi (B : Nat) : Real :=
+  (primeIdealsUpToNorm K B).sum fun P =>
+    (Nat.log (Ideal.absNorm P) B : Real) *
+      Real.log (Ideal.absNorm P : Real)
+
 theorem mem_primeIdealsUpToNorm_prime
     {B : Nat} {P : Ideal (NumberField.RingOfIntegers K)}
     (hP : Membership.mem (primeIdealsUpToNorm K B) P) : Prime P := by
