@@ -1,5 +1,5 @@
 import Robin1984.NicolasLandau.WeightedPsiIntegral
-import RobinBV.NumberField.Proof.QuadraticDedekindMellin
+import RobinBV.NumberField.Proof.QuadraticDedekindMellinTailPole
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroMass
 
 /-!
