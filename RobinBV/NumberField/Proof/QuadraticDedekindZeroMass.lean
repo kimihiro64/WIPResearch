@@ -149,6 +149,71 @@ theorem quadraticDedekindZeroMass_nonneg
     0 <= quadraticDedekindZeroMass D := by
   exact tsum_nonneg fun p => by positivity
 
+theorem quadraticDedekindZeroIndexEquiv_value
+    (D : NumberField.OddFundamentalDiscriminant)
+    (p : QuadraticDedekindZeroIndex D) :
+    Sum.elim riemannXiDivisorZeroValue quadraticLZeroValue
+        (quadraticDedekindZeroIndexEquiv D p) =
+      quadraticDedekindZeroValue p := by
+  cases p with
+  | mk p hp =>
+    cases p with
+    | mk z k =>
+      dsimp [quadraticDedekindZeroIndexEquiv]
+      cases hSplit : quadraticDedekindMultiplicityEquiv D z k <;> rfl
+
+theorem tsum_quadraticDedekindZeroKernel_eq_add
+    {M : Type*} [AddCommMonoid M] [TopologicalSpace M]
+    [ContinuousAdd M] [T2Space M]
+    (D : NumberField.OddFundamentalDiscriminant)
+    (kernel : Complex -> M)
+    (hXi : Summable (fun p : RiemannXiDivisorZeroIndex =>
+      kernel (riemannXiDivisorZeroValue p)))
+    (hL : Summable (fun p : QuadraticLZeroIndex D.character =>
+      kernel (quadraticLZeroValue p))) :
+    tsum (fun p : QuadraticDedekindZeroIndex D =>
+        kernel (quadraticDedekindZeroValue p)) =
+      tsum (fun p : RiemannXiDivisorZeroIndex =>
+          kernel (riemannXiDivisorZeroValue p)) +
+        tsum (fun p : QuadraticLZeroIndex D.character =>
+          kernel (quadraticLZeroValue p)) := by
+  let e := quadraticDedekindZeroIndexEquiv D
+  let g : Sum RiemannXiDivisorZeroIndex
+      (QuadraticLZeroIndex D.character) -> M :=
+    Sum.elim
+      (fun p => kernel (riemannXiDivisorZeroValue p))
+      (fun p => kernel (quadraticLZeroValue p))
+  have hReindexed :
+      tsum (fun p : QuadraticDedekindZeroIndex D =>
+          kernel (quadraticDedekindZeroValue p)) = tsum g := by
+    calc
+      tsum (fun p : QuadraticDedekindZeroIndex D =>
+          kernel (quadraticDedekindZeroValue p)) =
+          tsum (fun p : QuadraticDedekindZeroIndex D => g (e p)) := by
+        apply tsum_congr
+        intro p
+        have hg : g (e p) =
+            kernel (Sum.elim riemannXiDivisorZeroValue quadraticLZeroValue
+              (e p)) := by
+          cases e p <;> rfl
+        rw [hg, quadraticDedekindZeroIndexEquiv_value D p]
+      _ = tsum g := e.tsum_eq g
+  have hXiComp : Summable (Function.comp g Sum.inl) := by
+    simpa [g, Function.comp_def] using hXi
+  have hLComp : Summable (Function.comp g Sum.inr) := by
+    simpa [g, Function.comp_def] using hL
+  calc
+    tsum (fun p : QuadraticDedekindZeroIndex D =>
+        kernel (quadraticDedekindZeroValue p)) = tsum g := hReindexed
+    _ = tsum (Function.comp g Sum.inl) +
+        tsum (Function.comp g Sum.inr) :=
+      Summable.tsum_sum hXiComp hLComp
+    _ = tsum (fun p : RiemannXiDivisorZeroIndex =>
+          kernel (riemannXiDivisorZeroValue p)) +
+        tsum (fun p : QuadraticLZeroIndex D.character =>
+          kernel (quadraticLZeroValue p)) := by
+      rfl
+
 theorem quadraticDedekindZeroIndexEquiv_weight
     (D : NumberField.OddFundamentalDiscriminant)
     (p : QuadraticDedekindZeroIndex D) :
