@@ -19,6 +19,7 @@ import RobinBV.NumberField.Proof.QuadraticPrimePowerLayers
 import RobinBV.NumberField.Proof.QuadraticPrimeIdealNormMultiplicity
 import RobinBV.NumberField.Proof.QuadraticIdealTowerReserveBounds
 import RobinBV.NumberField.Proof.QuadraticIdealHeightLossBounds
+import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
 import RobinBV.NumberField.Proof.QuadraticDedekindWeightedError
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroMass
 import RobinBV.NumberField.Proof.QuadraticDedekindZeroSymmetry
