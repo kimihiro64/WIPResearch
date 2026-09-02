@@ -3,6 +3,7 @@ import RobinBV.CA.Helpers.LayerPartition
 import RobinBV.Mathlib
 import RobinBV.NumberField.Definitions.QuadraticDedekindZeta
 import RobinBV.NumberField.Definitions.RobinCriterion
+import RobinBV.NumberField.Proof.CriticalCorrectionBridge
 import RobinBV.NumberField.Proof.IdealAbundancyEulerProduct
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
 import RobinBV.NumberField.Proof.IdealCAObjective

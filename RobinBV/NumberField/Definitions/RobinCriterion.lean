@@ -28,9 +28,13 @@ noncomputable def idealDivisorSum
   by
     classical
     exact
-      ∑ J ∈ idealsUpToNorm K
-          (Ideal.absNorm (I : Ideal (NumberField.RingOfIntegers K))),
-        if J ∣ (I : Ideal (NumberField.RingOfIntegers K)) then Ideal.absNorm J else 0
+      Finset.sum
+        (idealsUpToNorm K
+          (Ideal.absNorm (I : Ideal (NumberField.RingOfIntegers K))))
+        (fun J =>
+          if Dvd.dvd J (I : Ideal (NumberField.RingOfIntegers K)) then
+            Ideal.absNorm J
+          else 0)
 
 /-- Ideal abundancy `sigma_K(I) / Norm(I)`. -/
 noncomputable def idealAbundancy
@@ -39,9 +43,9 @@ noncomputable def idealAbundancy
 
 /-- Candidate eventual Robin bound with an explicit residue constant. -/
 def EventualIdealRobinBound (kappa : Real) : Prop :=
-  ∃ X : Nat,
-    ∀ I : nonZeroDivisors (Ideal (NumberField.RingOfIntegers K)),
-    X < Ideal.absNorm (I : Ideal (NumberField.RingOfIntegers K)) →
+  Exists fun X : Nat =>
+    forall I : nonZeroDivisors (Ideal (NumberField.RingOfIntegers K)),
+    X < Ideal.absNorm (I : Ideal (NumberField.RingOfIntegers K)) ->
       (idealDivisorSum K I : Real) <
         Real.exp Real.eulerMascheroniConstant * kappa *
           Ideal.absNorm (I : Ideal (NumberField.RingOfIntegers K)) *
@@ -68,6 +72,36 @@ def EventualIdealRobinBoundWithCriticalCorrection
               (I : Ideal (NumberField.RingOfIntegers K)) /
                 Real.sqrt (Real.log (Ideal.absNorm
                   (I : Ideal (NumberField.RingOfIntegers K)) : Real))
+
+/-- Eventual logarithmic Robin-defect control at the completed-zeta critical
+scale. The domain clauses isolate the harmless large-height conditions used
+by the exponential bridge. -/
+def EventualIdealRobinLogDefectBound
+    (kappa coefficient : Real) : Prop :=
+  Exists fun X : Nat =>
+    forall I : nonZeroDivisors
+        (Ideal (NumberField.RingOfIntegers K)),
+      X < Ideal.absNorm
+          (I : Ideal (NumberField.RingOfIntegers K)) ->
+        And
+          (1 < Real.log (Ideal.absNorm
+            (I : Ideal (NumberField.RingOfIntegers K)) : Real))
+          (And
+            (coefficient /
+                (Real.sqrt (Real.log (Ideal.absNorm
+                  (I : Ideal (NumberField.RingOfIntegers K)) : Real)) *
+                  Real.log (Real.log (Ideal.absNorm
+                    (I : Ideal (NumberField.RingOfIntegers K)) : Real))) <=
+              1)
+            (Real.log (idealAbundancy K I) -
+                  Real.eulerMascheroniConstant - Real.log kappa -
+                  Real.log (Real.log (Real.log (Ideal.absNorm
+                    (I : Ideal (NumberField.RingOfIntegers K)) : Real))) <=
+                coefficient /
+                  (Real.sqrt (Real.log (Ideal.absNorm
+                    (I : Ideal (NumberField.RingOfIntegers K)) : Real)) *
+                    Real.log (Real.log (Ideal.absNorm
+                      (I : Ideal (NumberField.RingOfIntegers K)) : Real)))))
 
 /-- There is a nonnegative field-dependent correction for which the eventual
 critical-scale ideal Robin bound holds. -/
