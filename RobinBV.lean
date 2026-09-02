@@ -14,6 +14,8 @@ import RobinBV.NumberField.Proof.QuadraticLZeroMassEvaluation
 /-!
 # Public library root
 
-This module exports the exact exploratory targets and the first proved
-structural reduction. Neither headline target is claimed as a theorem.
+This module exports the exploratory targets and their proved structural
+reductions. The canonical quadratic Dedekind-zeta factorization is proved and
+registered as a headline theorem; the critical-scale Robin criterion remains
+open.
 -/
