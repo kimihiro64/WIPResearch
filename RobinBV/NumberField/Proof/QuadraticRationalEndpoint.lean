@@ -1,7 +1,7 @@
-import RobinBV.NumberField.Proof.QuadraticDedekindWeightedError
 import Robin1984.NicolasLandau.NicolasOscillation
 import Robin1984.NicolasLandau.WeightedEndpointZeros
 import Robin1984.NicolasLandau.WeightedTrivialCorrection
+import RobinBV.NumberField.Proof.QuadraticDedekindWeightedError
 
 /-!
 # Collision-free rational endpoint formula

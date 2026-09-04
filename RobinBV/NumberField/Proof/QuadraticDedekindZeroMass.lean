@@ -1,10 +1,17 @@
 import Mathlib.Logic.Equiv.Sum
 import PrimeNumberTheoremAnd.Mathlib.NumberTheory.LSeries.RiemannXiDivisorZeros
-import RobinBV.NumberField.Proof.QuadraticDedekindRightmostZero
 import RobinBV.NumberField.Proof.CriticalCorrectionBridge
 import RobinBV.NumberField.Proof.QuadraticDedekindERH
+import RobinBV.NumberField.Proof.QuadraticDedekindRightmostZero
 import RobinBV.NumberField.Proof.QuadraticLZeroMass
 import RobinBV.NumberField.Proof.QuadraticLZeroMassEvaluation
+
+/-!
+# Multiplicity-counted quadratic Dedekind zero mass
+
+This module combines the zeta and quadratic L-function zero divisors and
+identifies their additive mass in the field critical-correction coefficient.
+-/
 
 namespace RobinBV.NumberField
 

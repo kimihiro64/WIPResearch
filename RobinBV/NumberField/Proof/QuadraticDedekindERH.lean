@@ -1,6 +1,13 @@
 import RobinBV.NumberField.Definitions.QuadraticLZeros
 import RobinBV.NumberField.Proof.QuadraticDedekindZetaZeros
 
+/-!
+# Quadratic Dedekind ERH and its two factors
+
+This module identifies ERH for the canonical quadratic Dedekind continuation
+with RH for zeta and ERH for the primitive quadratic Dirichlet L-function.
+-/
+
 namespace RobinBV.NumberField
 
 open BombieriVinogradov.SiegelWalfisz

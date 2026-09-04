@@ -1,5 +1,5 @@
-import RobinBV.NumberField.Proof.IdealNicolasTransfer
 import RobinBV.NumberField.Proof.CriticalCorrectionBridge
+import RobinBV.NumberField.Proof.IdealNicolasTransfer
 import RobinBV.NumberField.Proof.QuadraticIdealHeightLossBounds
 
 /-!

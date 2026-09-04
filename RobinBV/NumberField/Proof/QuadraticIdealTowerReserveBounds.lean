@@ -1,8 +1,8 @@
+import Mathlib.Analysis.PSeries
+import Mathlib.Analysis.Real.Sqrt
+import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 import RobinBV.NumberField.Proof.IdealEulerReserveBounds
 import RobinBV.NumberField.Proof.QuadraticPrimeIdealNormMultiplicity
-import Mathlib.Analysis.PSeries
-import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
-import Mathlib.Analysis.Real.Sqrt
 
 /-!
 # Quadratic ideal-lcm tower reserve bounds

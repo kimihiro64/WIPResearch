@@ -3,6 +3,13 @@ import Mathlib.NumberTheory.Harmonic.EulerMascheroni
 import RobinBV.NumberField.Definitions.RobinCriterion
 import RobinBV.NumberField.Proof.IdealAbundancyEulerProduct
 
+/-!
+# From logarithmic defects to additive critical corrections
+
+This module turns the ideal logarithmic-defect estimate into the additive
+square-root correction used by the field Robin criterion.
+-/
+
 open UniqueFactorizationMonoid
 
 namespace RobinBV.NumberField
