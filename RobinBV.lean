@@ -1,6 +1,7 @@
 import RobinBV.CA.Definitions.Distribution
 import RobinBV.CA.Helpers.LayerPartition
 import RobinBV.Mathlib
+import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
 import RobinBV.NumberField.Proof.QuadraticDedekindWeightedError
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
