@@ -3,6 +3,7 @@ import RobinBV.CA.Helpers.LayerPartition
 import RobinBV.Mathlib
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
+import RobinBV.NumberField.Proof.QuadraticCharacterEndpoint
 import RobinBV.NumberField.Proof.QuadraticDedekindWeightedError
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
 import RobinBV.NumberField.Proof.QuadraticPrimePowerLayers
