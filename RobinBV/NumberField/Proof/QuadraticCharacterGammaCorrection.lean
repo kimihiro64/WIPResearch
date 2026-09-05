@@ -357,6 +357,72 @@ theorem quadraticCharacter_even_gamma_pairing
       K * integral volume O by ring]
   rw [hAtOne, hGamma, hOrigin]
 
+theorem primitiveCharacter_robinCutoffMellin_complete_zero_pairing
+    {N : Nat} [NeZero N] {chi : DirichletCharacter Complex N}
+    (hchi : Not (chi = 1))
+    (hPrimitive : DirichletCharacter.IsPrimitive chi)
+    (hERH : DirichletERH chi)
+    {n : Nat} (hn : 2 <= n) {x : Real} (hx : 1 < x) :
+    (((1 / (2 * Real.pi) : Real) : Complex)) *
+        integral volume (fun t : Real =>
+          mellin (Robin1984.robinCutoffMellinTest n x)
+              ((3 / 2 : Complex) + (t : Complex) * Complex.I) *
+            tsum (fun p : QuadraticLZeroIndex chi =>
+              1 / ((3 / 2 : Complex) + (t : Complex) * Complex.I -
+                quadraticLZeroValue p) +
+              1 / quadraticLZeroValue p)) =
+      tsum (fun p : QuadraticLZeroIndex chi =>
+        Robin1984.robinZeroKernel n (quadraticLZeroValue p) x /
+          quadraticLZeroValue p) := by
+  choose C hC hBound using
+    Robin1984.exists_robinCutoffMellin_safeLine_majorant hn hx
+  have hnOne : 1 <= n := by omega
+  have hnReal : (2 : Real) <= n := by exact_mod_cast hn
+  have hcLt : (3 / 2 : Real) < n := by linarith
+  let H : Real -> Complex := fun t =>
+    mellin (Robin1984.robinCutoffMellinTest n x)
+      ((3 / 2 : Complex) + (t : Complex) * Complex.I)
+  have hH : Integrable H := by
+    simpa [H, Complex.VerticalIntegrable] using!
+      Robin1984.verticalIntegrable_mellin_robinCutoffMellinTest
+        hnOne hx (by norm_num : (0 : Real) < 3 / 2) hcLt
+  have hSwap :=
+    integral_tsum_quadraticL_paired_atoms
+      hchi hPrimitive hERH hH hC hBound
+  have hIntegral : integral volume (fun t : Real => H t *
+      tsum (fun p : QuadraticLZeroIndex chi =>
+        1 / ((3 / 2 : Complex) + (t : Complex) * Complex.I -
+          quadraticLZeroValue p) +
+        1 / quadraticLZeroValue p)) =
+      tsum (fun p : QuadraticLZeroIndex chi =>
+        integral volume (fun t : Real =>
+          H t * (1 / ((3 / 2 : Complex) + (t : Complex) * Complex.I -
+            quadraticLZeroValue p) +
+          1 / quadraticLZeroValue p))) := by
+    rw [hSwap]
+    apply integral_congr_ae
+    filter_upwards with t
+    rw [tsum_mul_left]
+  change (((1 / (2 * Real.pi) : Real) : Complex)) *
+    integral volume (fun t : Real => H t *
+      tsum (fun p : QuadraticLZeroIndex chi =>
+        1 / ((3 / 2 : Complex) + (t : Complex) * Complex.I -
+          quadraticLZeroValue p) +
+        1 / quadraticLZeroValue p)) = _
+  rw [hIntegral, <- tsum_mul_left]
+  apply tsum_congr
+  intro p
+  have hRe :=
+    quadraticLZeroValue_re_eq_half_of_dirichletERH
+      hchi hPrimitive hERH p
+  simpa [H] using!
+    Robin1984.robinCutoffMellin_paired_zero_atom
+      hnOne hx (by norm_num : (0 : Real) < 3 / 2) hcLt
+      p.property
+      (by rw [hRe]; norm_num :
+        (quadraticLZeroValue p).re < (3 / 2 : Real))
+
+
 end
 
 end RobinBV.NumberField

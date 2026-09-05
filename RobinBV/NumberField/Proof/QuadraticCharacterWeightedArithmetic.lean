@@ -458,6 +458,222 @@ theorem quadraticCharacterPrimePowerSum_eq_weightedIntegral
         rw [quadraticCharacterChebyshevSum_im]
         simp
 
+theorem summable_primitiveCharacter_twistedMangoldt_cpow
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    {s : Complex} (hs : 1 < s.re) :
+    Summable (fun m : Nat =>
+      twistedMangoldtSequence chi m / (m : Complex) ^ s) := by
+  have hSeries : LSeriesSummable
+      (twistedMangoldtSequence chi) s := by
+    have hSequence : twistedMangoldtSequence chi =
+        (fun n : Nat => chi n) *
+          (fun n : Nat => (ArithmeticFunction.vonMangoldt n : Complex)) := by
+      funext n
+      rfl
+    rw [hSequence]
+    exact DirichletCharacter.LSeriesSummable_twist_vonMangoldt chi hs
+  refine hSeries.congr ?_
+  intro m
+  by_cases hm : m = 0
+  next => simp [hm, twistedMangoldtSequence]
+  next => rw [LSeries.term_of_ne_zero hm]
+
+theorem tsum_primitiveCharacter_twistedMangoldt_eq_neg_logDeriv
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    {s : Complex} (hs : 1 < s.re) :
+    tsum (fun m : Nat =>
+      twistedMangoldtSequence chi m / (m : Complex) ^ s) =
+      -logDeriv chi.LFunction s := by
+  rw [neg_logDeriv_LFunction_eq_LSeries chi hs, LSeries]
+  apply tsum_congr
+  intro m
+  by_cases hm : m = 0
+  next => simp [hm, twistedMangoldtSequence]
+  next => rw [LSeries.term_of_ne_zero hm]
+
+theorem norm_primitiveCharacter_twistedMangoldt_vertical_eq
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    (c t : Real) (m : Nat) :
+    norm (twistedMangoldtSequence chi m /
+        (m : Complex) ^ ((c : Complex) + (t : Complex) * Complex.I)) =
+      norm (twistedMangoldtSequence chi m /
+        (m : Complex) ^ (c : Complex)) := by
+  cases m with
+  | zero => simp [twistedMangoldtSequence]
+  | succ m =>
+      rw [norm_div, norm_div,
+        Complex.norm_natCast_cpow_of_pos (Nat.succ_pos m),
+        Complex.norm_natCast_cpow_of_pos (Nat.succ_pos m)]
+      simp
+
+theorem integral_primitiveCharacter_twistedMangoldt_series_mul
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    {c : Real} (hc : 1 < c)
+    {H : Real -> Complex} (hH : Integrable H) :
+    tsum (fun m : Nat => integral volume (fun t : Real =>
+        (twistedMangoldtSequence chi m /
+          (m : Complex) ^ ((c : Complex) +
+            (t : Complex) * Complex.I)) * H t)) =
+      integral volume (fun t : Real =>
+        (-logDeriv chi.LFunction
+          ((c : Complex) + (t : Complex) * Complex.I)) * H t) := by
+  let F : Nat -> Real -> Complex := fun m t =>
+    (twistedMangoldtSequence chi m /
+      (m : Complex) ^ ((c : Complex) +
+        (t : Complex) * Complex.I)) * H t
+  let A : Nat -> Real := fun m =>
+    norm (twistedMangoldtSequence chi m /
+      (m : Complex) ^ (c : Complex))
+  have hNorm : forall m : Nat, forall t : Real,
+      norm (F m t) = A m * norm (H t) := by
+    intro m t
+    dsimp [F, A]
+    rw [norm_mul,
+      norm_primitiveCharacter_twistedMangoldt_vertical_eq chi]
+  have hFInt : forall m : Nat, Integrable (F m) := by
+    intro m
+    have hCoeffMeas : Measurable (fun t : Real =>
+        twistedMangoldtSequence chi m /
+          (m : Complex) ^ ((c : Complex) +
+            (t : Complex) * Complex.I)) := by
+      fun_prop
+    have hFMeas : AEStronglyMeasurable (F m) volume :=
+      hCoeffMeas.aestronglyMeasurable.mul hH.aestronglyMeasurable
+    apply (hH.norm.const_mul (A m)).mono' hFMeas
+    filter_upwards with t
+    rw [hNorm]
+  have hNormIntegral : forall m : Nat,
+      integral volume (fun t : Real => norm (F m t)) =
+        A m * integral volume (fun t : Real => norm (H t)) := by
+    intro m
+    have hFunction : (fun t : Real => norm (F m t)) =
+        (fun t : Real => A m * norm (H t)) := by
+      funext t
+      exact hNorm m t
+    rw [hFunction, integral_const_mul]
+  have hASum : Summable A := by
+    exact (summable_primitiveCharacter_twistedMangoldt_cpow chi
+      (s := (c : Complex)) (by simpa using hc)).norm
+  have hNormSum : Summable (fun m : Nat =>
+      integral volume (fun t : Real => norm (F m t))) := by
+    have hProduct := hASum.mul_right
+      (integral volume (fun t : Real => norm (H t)))
+    exact hProduct.congr (fun m => (hNormIntegral m).symm)
+  calc
+    tsum (fun m : Nat => integral volume (F m)) =
+        integral volume (fun t : Real => tsum (fun m : Nat => F m t)) :=
+      integral_tsum_of_summable_integral_norm hFInt hNormSum
+    _ = integral volume (fun t : Real =>
+        (-logDeriv chi.LFunction
+          ((c : Complex) + (t : Complex) * Complex.I)) * H t) := by
+      apply integral_congr_ae
+      filter_upwards with t
+      dsimp [F]
+      rw [tsum_mul_right,
+        tsum_primitiveCharacter_twistedMangoldt_eq_neg_logDeriv
+          chi (by simpa using hc)]
+
+theorem primitiveCharacter_twistedMangoldt_mul_cutoff_eq_integral
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    {n : Nat} (hn : 1 <= n) {x : Real} (hx : 1 < x)
+    {c : Real} (hcPos : 0 < c) (hcLt : c < n) (m : Nat) :
+    twistedMangoldtSequence chi m *
+        Robin1984.robinCutoffMellinTest n x (m : Real) =
+      (((1 / (2 * Real.pi) : Real) : Complex)) *
+        integral volume (fun t : Real =>
+          (twistedMangoldtSequence chi m /
+            (m : Complex) ^ ((c : Complex) +
+              (t : Complex) * Complex.I)) *
+            mellin (Robin1984.robinCutoffMellinTest n x)
+              ((c : Complex) + (t : Complex) * Complex.I)) := by
+  by_cases hm : m = 0
+  next => simp [hm, twistedMangoldtSequence]
+  next =>
+    have hmPos : 0 < (m : Real) := by
+      exact_mod_cast (Nat.pos_of_ne_zero hm)
+    have hInv := Robin1984.mellinInv_mellin_robinCutoffMellinTest
+      hn hx hcPos hcLt hmPos
+    simp only [mellinInv, RCLike.real_smul_eq_coe_mul, smul_eq_mul,
+      Complex.ofReal_natCast] at hInv
+    rw [<- hInv]
+    calc
+      twistedMangoldtSequence chi m *
+          ((((1 / (2 * Real.pi) : Real) : Complex)) *
+            integral volume (fun t : Real =>
+              (m : Complex) ^ (-((c : Complex) +
+                (t : Complex) * Complex.I)) *
+                mellin (Robin1984.robinCutoffMellinTest n x)
+                  ((c : Complex) + (t : Complex) * Complex.I))) =
+        (((1 / (2 * Real.pi) : Real) : Complex)) *
+          (twistedMangoldtSequence chi m *
+            integral volume (fun t : Real =>
+              (m : Complex) ^ (-((c : Complex) +
+                (t : Complex) * Complex.I)) *
+                mellin (Robin1984.robinCutoffMellinTest n x)
+                  ((c : Complex) + (t : Complex) * Complex.I))) := by
+        ring
+      _ = (((1 / (2 * Real.pi) : Real) : Complex)) *
+          integral volume (fun t : Real =>
+            twistedMangoldtSequence chi m *
+              ((m : Complex) ^ (-((c : Complex) +
+                (t : Complex) * Complex.I)) *
+                mellin (Robin1984.robinCutoffMellinTest n x)
+                  ((c : Complex) + (t : Complex) * Complex.I))) := by
+        rw [integral_const_mul]
+      _ = _ := by
+        congr 1
+        apply integral_congr_ae
+        filter_upwards with t
+        rw [Complex.cpow_neg, div_eq_mul_inv]
+        ring
+
+theorem primitiveCharacterPrimePowerSum_eq_safeLineIntegral
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    {n : Nat} (hn : 1 <= n) {x : Real} (hx : 1 < x)
+    {c : Real} (hc : 1 < c) (hcLt : c < n) :
+    tsum (fun m : Nat => twistedMangoldtSequence chi m *
+        Robin1984.robinCutoffMellinTest n x (m : Real)) =
+      (((1 / (2 * Real.pi) : Real) : Complex)) *
+        integral volume (fun t : Real =>
+          (-logDeriv chi.LFunction
+            ((c : Complex) + (t : Complex) * Complex.I)) *
+            mellin (Robin1984.robinCutoffMellinTest n x)
+              ((c : Complex) + (t : Complex) * Complex.I)) := by
+  have hcPos : 0 < c := lt_trans Real.zero_lt_one hc
+  have hVertical : Integrable (fun t : Real =>
+      mellin (Robin1984.robinCutoffMellinTest n x)
+        ((c : Complex) + (t : Complex) * Complex.I)) :=
+    Robin1984.verticalIntegrable_mellin_robinCutoffMellinTest
+      hn hx hcPos hcLt
+  have hSwap :=
+    integral_primitiveCharacter_twistedMangoldt_series_mul
+      chi hc hVertical
+  calc
+    tsum (fun m : Nat => twistedMangoldtSequence chi m *
+        Robin1984.robinCutoffMellinTest n x (m : Real)) =
+      tsum (fun m : Nat =>
+        (((1 / (2 * Real.pi) : Real) : Complex)) *
+          integral volume (fun t : Real =>
+            (twistedMangoldtSequence chi m /
+              (m : Complex) ^ ((c : Complex) +
+                (t : Complex) * Complex.I)) *
+              mellin (Robin1984.robinCutoffMellinTest n x)
+                ((c : Complex) + (t : Complex) * Complex.I))) := by
+        apply tsum_congr
+        intro m
+        exact primitiveCharacter_twistedMangoldt_mul_cutoff_eq_integral
+          chi hn hx hcPos hcLt m
+    _ = (((1 / (2 * Real.pi) : Real) : Complex)) *
+        tsum (fun m : Nat => integral volume (fun t : Real =>
+          (twistedMangoldtSequence chi m /
+            (m : Complex) ^ ((c : Complex) +
+              (t : Complex) * Complex.I)) *
+            mellin (Robin1984.robinCutoffMellinTest n x)
+              ((c : Complex) + (t : Complex) * Complex.I))) := by
+      rw [tsum_mul_left]
+    _ = _ := by rw [hSwap]
+
+
 end
 
 end RobinBV.NumberField
