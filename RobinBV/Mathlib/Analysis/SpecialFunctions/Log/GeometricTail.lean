@@ -3,6 +3,7 @@ Copyright (c) 2026 Jonas Whidden. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+import Mathlib.Algebra.BigOperators.Intervals
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.SpecificLimits.Normed
 
@@ -159,6 +160,47 @@ theorem shiftedGeometricLogRemainder_re_nonneg
   intro n
   simp only [<- Complex.ofReal_pow, <- Complex.ofReal_mul, Complex.ofReal_re]
   exact mul_nonneg (pow_nonneg hr0 _) (geometricLogRemainderRatio_bounds K n hu0 hu1).1
+
+/-- Exact finite positive-power geometric identity, including an empty sum. -/
+theorem sum_pow_Icc_one_mul_one_sub (w : Complex) (K : Nat) :
+    Finset.sum (Finset.Icc 1 K) (fun k => w ^ k) * (1 - w) =
+      w - w ^ (K + 1) := by
+  induction K with
+  | zero =>
+    simp
+  | succ K hK =>
+    rw [Finset.sum_Icc_succ_top (by omega), add_mul, hK]
+    simp only [pow_succ]
+    ring
+
+/-- The finite nonresonant sum retains its exact terminal power. -/
+theorem sum_pow_Icc_one_eq_div {w : Complex} (hw : Not (w = 1)) (K : Nat) :
+    Finset.sum (Finset.Icc 1 K) (fun k => w ^ k) = w * (1 - w ^ K) / (1 - w) := by
+  have hDen : Not (1 - w = 0) := fun h => hw (sub_eq_zero.mp h).symm
+  apply (eq_div_iff hDen).2
+  rw [sum_pow_Icc_one_mul_one_sub, pow_succ]
+  ring
+
+/-- Uniform bound for every nonresonant finite power sum in the closed unit
+disk. The actual denominator is retained, including near resonance. -/
+theorem norm_sum_pow_Icc_one_le
+    {w : Complex} (hw : Not (w = 1)) (hNorm : norm w <= 1) (K : Nat) :
+    norm (Finset.sum (Finset.Icc 1 K) (fun k => w ^ k)) <=
+      2 * norm w / norm (1 - w) := by
+  have hPower : norm w ^ K <= 1 := by
+    calc
+      _ <= (1 : Real) ^ K := by gcongr
+      _ = 1 := one_pow K
+  have hNumerator : norm (1 - w ^ K) <= 2 := by
+    calc
+      _ <= norm (1 : Complex) + norm (w ^ K) := norm_sub_le _ _
+      _ = 1 + norm w ^ K := by rw [norm_one, norm_pow]
+      _ <= 2 := by linarith
+  rw [sum_pow_Icc_one_eq_div hw, norm_div, norm_mul]
+  apply div_le_div_of_nonneg_right _ (norm_nonneg _)
+  calc
+    _ <= norm w * 2 := mul_le_mul_of_nonneg_left hNumerator (norm_nonneg w)
+    _ = _ := mul_comm _ _
 
 end
 

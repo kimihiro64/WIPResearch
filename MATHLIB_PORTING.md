@@ -40,6 +40,7 @@ Replace the scaffold row when the first real candidate module is created.
 
 | Project module | Proposed Mathlib path | Readiness | Upstream reference |
 | --- | --- | --- | --- |
+| `RobinBV.Mathlib.NumberTheory.PrimePow.LogCutoff` | `Mathlib/NumberTheory/PrimePow/LogCutoff.lean` | project-verified | Exact real cutoff between consecutive integer powers and the signed logarithmic gap, including every power transition |
 | `RobinBV.Mathlib.NumberTheory.DirichletCharacter.PrimePowerCorrection` | `Mathlib/NumberTheory/DirichletCharacter/PrimePowerCorrection.lean` | project-verified | Exact finite Mangoldt conductor correction and the complete local geometric-log tail at a prime; pointwise conductor identity adapted from BombieriVinogradov at `1ed555f755ef71491890143de49f2f3fdb9d8c7e` (Apache-2.0), with no project import |
 | `RobinBV.Mathlib.NumberTheory.PrimePow.FiniteSum` | `Mathlib/NumberTheory/PrimePow/FiniteSum.lean` | project-verified | Complete unique-prime reindexing of arbitrary additive prime-power-supported weights meeting a modulus, with exact logarithmic exponent bounds and cutoff zero included |
 | `RobinBV.Mathlib.Analysis.SpecialFunctions.Log.GeometricTail` | `Mathlib/Analysis/SpecialFunctions/Log/GeometricTail.lean` | project-verified | Exact shifted geometric-logarithm tail decomposition with a complete inverse-cutoff remainder bound and the resonant real sign; retains the position between consecutive powers |

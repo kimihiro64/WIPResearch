@@ -8,6 +8,7 @@ import Mathlib.NumberTheory.DirichletCharacter.Bounds
 import Mathlib.RingTheory.Coprime.Lemmas
 import RobinBV.Mathlib.Analysis.SpecialFunctions.Log.GeometricTail
 import RobinBV.Mathlib.NumberTheory.PrimePow.FiniteSum
+import RobinBV.Mathlib.NumberTheory.PrimePow.LogCutoff
 
 /-!
 # Finite and geometric prime-power corrections for Dirichlet characters
@@ -127,6 +128,65 @@ theorem primePowerGeometricTail_identity
     have hOne : (1 : Real) < p := by exact_mod_cast hp.one_lt
     linarith
   field_simp [hpNe, hDen]
+
+/-- Full prime-power Chebyshev contribution at a real cutoff. -/
+def primePowerChebyshevStep {N : Nat} (chi : DirichletCharacter Complex N)
+    (p : Nat) (t : Real) : Complex :=
+  (Real.log p : Complex) * Finset.sum (Finset.Icc 1 (Nat.log p (Nat.floor t)))
+    (fun k => chi (p : ZMod N) ^ k)
+
+/-- Resonance counts exactly character value one; zero and every other
+character value contribute zero to the logarithmic main term. -/
+def primePowerResonance {N : Nat} (chi : DirichletCharacter Complex N) (p : Nat) : Nat := by
+  classical
+  exact if chi (p : ZMod N) = 1 then 1 else 0
+
+/-- An explicit constant for the complete prime-power step error, retaining
+the nonresonant character denominator. -/
+def primePowerStepErrorBound {N : Nat} (chi : DirichletCharacter Complex N) (p : Nat) : Real := by
+  classical
+  exact if chi (p : ZMod N) = 1 then Real.log p
+    else 2 * Real.log p * norm (chi (p : ZMod N)) / norm (1 - chi (p : ZMod N))
+
+theorem primePowerStepErrorBound_nonneg
+    {N : Nat} (chi : DirichletCharacter Complex N) {p : Nat} (hp : Nat.Prime p) :
+    0 <= chi.primePowerStepErrorBound p := by
+  classical
+  have hLog : 0 <= Real.log p := Real.log_nonneg (by exact_mod_cast hp.one_le)
+  unfold primePowerStepErrorBound
+  split_ifs <;> positivity
+
+/-- Removing exactly the resonant logarithm leaves a uniformly bounded
+error for the complete prime-power step, with no ERH hypothesis. -/
+theorem norm_primePowerChebyshevStep_sub_resonance_log_le
+    {N : Nat} (chi : DirichletCharacter Complex N) {p : Nat} (hp : Nat.Prime p)
+    {t : Real} (ht : 1 <= t) :
+    norm (chi.primePowerChebyshevStep p t -
+      (chi.primePowerResonance p : Complex) * (Real.log t : Complex)) <=
+        chi.primePowerStepErrorBound p := by
+  classical
+  have hLog : 0 <= Real.log p := Real.log_nonneg (by exact_mod_cast hp.one_le)
+  by_cases hRes : chi (p : ZMod N) = 1
+  case pos =>
+    have hGap := Nat.log_sub_log_floor_mul_log_bounds hp.one_lt ht
+    have hExpression : chi.primePowerChebyshevStep p t -
+        (chi.primePowerResonance p : Complex) * (Real.log t : Complex) =
+        (((Nat.log p (Nat.floor t) : Real) * Real.log p - Real.log t : Real) : Complex) := by
+      simp [primePowerChebyshevStep, primePowerResonance, hRes]
+      ring
+    rw [hExpression, Complex.norm_real, Real.norm_eq_abs,
+      abs_of_nonpos (by linarith [hGap.1])]
+    simp only [primePowerStepErrorBound, if_pos hRes]
+    linarith [hGap.2]
+  case neg =>
+    simp only [primePowerResonance, if_neg hRes, Nat.cast_zero, zero_mul, sub_zero,
+      primePowerChebyshevStep, primePowerStepErrorBound]
+    rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hLog]
+    calc
+      _ <= Real.log p * (2 * norm (chi (p : ZMod N)) / norm (1 - chi (p : ZMod N))) :=
+        mul_le_mul_of_nonneg_left
+          (Complex.norm_sum_pow_Icc_one_le hRes (chi.norm_le_one _) _) hLog
+      _ = _ := by ring
 
 end
 
