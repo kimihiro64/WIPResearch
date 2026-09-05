@@ -4,8 +4,8 @@ import RobinBV.Mathlib
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.DirichletGRHCriterion
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
+import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
-import RobinBV.NumberField.Proof.MovingCharacterSecondary
 import RobinBV.NumberField.Proof.QuadraticDedekindNicolasOmega
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
 import RobinBV.NumberField.Proof.QuadraticPrimePowerLayers
@@ -30,6 +30,10 @@ higher-order characters. After retaining the first m finite prime moments
 exactly, the first omitted layer has coefficient -(m+1)/m^2 at scale
 P^(m^2/(m+1))*log(P) precisely when the (m+1)-st character power is
 principal, and zero otherwise. Every higher layer and the full cap error
-are proved negligible at this scale. No RH, ERH or GRH assertion is proved merely by
-these equivalences or correction estimates.
+are proved negligible at this scale. Under ERH of a nonprincipal cubic
+character power, a further quartic term has coefficient -2/3 at scale
+P^(3/2)*log(P) when the fourth power is principal, and zero otherwise.
+Its full higher-weight and root-prime ERH estimates cover both parities
+and imprimitive characters. No RH, ERH or GRH assertion is proved merely
+by these equivalences or conditional correction estimates.
 -/

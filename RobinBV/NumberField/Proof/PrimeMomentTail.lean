@@ -388,6 +388,63 @@ theorem rootPrimeCharacterTail_cap_error_scaled_le
   rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hScale]
   exact (mul_le_mul_of_nonneg_left hMajor hScale).trans_eq hNormalize
 
+/-- The complete root-prime conductor correction is bounded by the
+finite excluded prime mass and the exact total Robin weight. -/
+theorem norm_rootPrimeCharacterTail_sub_primitive_le
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N) {r x : Real}
+    (hr : r < 1) (hx : 1 < x) :
+    norm (rootPrimeCharacterTail chi r x - rootPrimeCharacterTail chi.primitiveCharacter r x) <=
+      Finset.sum N.primeFactors (fun p => Real.log p) / (x * Real.log x) := by
+  let C : Real := Finset.sum N.primeFactors (fun p => Real.log p)
+  have hLeft := integrableOn_rootPrimeCharacterTail chi hr hx
+  have hRight := integrableOn_rootPrimeCharacterTail chi.primitiveCharacter hr hx
+  have hMajor := (Robin1984.integrableOn_robinRealWeight (n := 1) (by norm_num) hx).const_mul C
+  unfold rootPrimeCharacterTail
+  rw [<- integral_sub hLeft hRight]
+  have hBound : Filter.Eventually (fun t : Real =>
+      norm (chi.primeChebyshevSum (Nat.floor (t ^ r)) * (Robin1984.robinRealWeight 1 t : Complex) -
+        chi.primitiveCharacter.primeChebyshevSum (Nat.floor (t ^ r)) *
+          (Robin1984.robinRealWeight 1 t : Complex)) <= C * Robin1984.robinRealWeight 1 t)
+      (ae (volume.restrict (Ioi x))) := by
+    filter_upwards [ae_restrict_mem measurableSet_Ioi] with t ht
+    have hWeight := Robin1984.robinRealWeight_nonneg (n := 1) (hx.trans ht)
+    rw [<- sub_mul, norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hWeight]
+    exact mul_le_mul_of_nonneg_right (chi.norm_primeChebyshevSum_sub_primitive_le _) hWeight
+  have hNorm := norm_integral_le_of_norm_le hMajor hBound
+  rw [integral_const_mul, Robin1984.integral_robinRealWeight (by norm_num : 1 <= (1 : Nat)) hx] at hNorm
+  norm_num only [Nat.cast_one, Real.rpow_neg_one] at hNorm
+  exact hNorm.trans_eq (by dsimp only [C]; ring)
+
+/-- The entire finite conductor correction vanishes at every positive
+power-saving normalization, uniformly over the root variable for fixed level. -/
+theorem rootPrimeCharacterTail_sub_primitive_scaled_tendsto
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N) {r s : Real}
+    (hr : r < 1) (hs : 0 < s) :
+    Tendsto (fun x : Real => ((x ^ (1 - s) * Real.log x : Real) : Complex) *
+      (rootPrimeCharacterTail chi r x - rootPrimeCharacterTail chi.primitiveCharacter r x))
+      atTop (nhds (0 : Complex)) := by
+  let C : Real := Finset.sum N.primeFactors (fun p => Real.log p)
+  have hUpper : Tendsto (fun x : Real => C * x ^ (-s)) atTop (nhds (0 : Real)) := by
+    simpa only [mul_zero] using (tendsto_rpow_neg_atTop hs).const_mul C
+  apply tendsto_zero_iff_norm_tendsto_zero.mpr
+  apply squeeze_zero' (Filter.Eventually.of_forall (fun _ => norm_nonneg _)) _ hUpper
+  filter_upwards [Filter.eventually_gt_atTop (1 : Real)] with x hx
+  have hxPos : 0 < x := lt_trans Real.zero_lt_one hx
+  have hLog := (Real.log_pos hx).ne'
+  have hScale : 0 <= x ^ (1 - s) * Real.log x :=
+    mul_nonneg (Real.rpow_nonneg hxPos.le _) (Real.log_pos hx).le
+  have hPower : x ^ (1 - s) / x = x ^ (-s) := by
+    calc
+      _ = x ^ (1 - s) / x ^ (1 : Real) := by rw [Real.rpow_one]
+      _ = x ^ ((1 - s) - 1) := (Real.rpow_sub hxPos _ _).symm
+      _ = _ := by congr 1; ring
+  rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hScale]
+  calc
+    _ <= (x ^ (1 - s) * Real.log x) * (C / (x * Real.log x)) :=
+      mul_le_mul_of_nonneg_left (norm_rootPrimeCharacterTail_sub_primitive_le chi hr hx) hScale
+    _ = C * (x ^ (1 - s) / x) := by field_simp [hLog]
+    _ = _ := by rw [hPower]
+
 end
 
 end RobinBV.NumberField
