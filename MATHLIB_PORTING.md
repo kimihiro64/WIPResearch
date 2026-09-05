@@ -40,6 +40,7 @@ Replace the scaffold row when the first real candidate module is created.
 
 | Project module | Proposed Mathlib path | Readiness | Upstream reference |
 | --- | --- | --- | --- |
+| `RobinBV.Mathlib.NumberTheory.DirichletCharacter.FiniteEulerProduct` | `Mathlib/NumberTheory/DirichletCharacter/FiniteEulerProduct.lean` | project-verified | Exact capped character Euler products, full overflow linearization, squared-character exponent-one block, and complete complementary-cap and nonlinear error bounds |
 | `RobinBV.Mathlib.Analysis.Normed.Ring.FiniteProductRemainder` | `Mathlib/Analysis/Normed/Ring/FiniteProductRemainder.lean` | project-verified | Full linearization remainder for finite products in seminormed commutative rings; polynomial majorant and off-diagonal quadratic bound, with no smallness assumption |
 | `RobinBV.Mathlib.Algebra.QuadraticAlgebra.Discriminant` | `Mathlib/Algebra/QuadraticAlgebra/Discriminant.lean` | project-verified | Computes the discriminant of the canonical basis of a quadratic algebra, including the odd-discriminant integer specialization |
 | `RobinBV.Mathlib.NumberTheory.NumberField.Ideal.Factorization` | `Mathlib/NumberTheory/NumberField/Ideal/Factorization.lean` | project-verified | Extends the distinct-factor calculation already used internally by `Ideal.quotientEquivPiFactors` |
