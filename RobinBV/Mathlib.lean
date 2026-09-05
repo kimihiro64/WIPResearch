@@ -1,3 +1,4 @@
+import RobinBV.Mathlib.Analysis.Complex.LogDerivContinuation
 import RobinBV.Mathlib.Analysis.MellinTail
 import RobinBV.Mathlib.MeasureTheory.Integral.TailSwap
 import RobinBV.Mathlib.NumberTheory.DirichletCharacter.FiniteEulerProduct
