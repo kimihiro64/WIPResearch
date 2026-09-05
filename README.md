@@ -20,12 +20,16 @@ This repository is in exploratory research mode. It currently contains:
   and the repeated-prime-power remainder;
 - a finite ideal-divisor sum and eventual Robin-bound schema for a fixed
   number field, with the Dedekind-zeta residue and ERH predicate still explicit
-  inputs; and
+  inputs;
+- a proved reverse analytic bridge: failure of quadratic Dedekind ERH forces
+  an `OmegaMinus` excursion of the quadratic Dedekind Nicolas function at some
+  exponent `0 < b < 1/2`, with separate nonreal-zero and signed real-zero
+  arguments; and
 - a quadratic-degree specialization that is deliberately a definition of the
   research target, not a claimed equivalence.
 
 Neither headline theorem is proved. `Challenge.lean` and `Solution.lean`
-currently expose only the proved layer decomposition.
+currently expose only the proved quadratic Dedekind-zeta factorization.
 
 ## CA distribution route
 
@@ -104,16 +108,15 @@ relevant source for the consecutive-CA threshold problem.
 The repository uses local path dependencies while it is exploratory:
 
 - `Robin1984` at clean HEAD
-  `bfa72aec0c25c8ee29cefe4449d778ff30412bee`;
-- `bombieri-vinogradov` at clean HEAD
-  `9fd1886f609829b0489cd3824ff25eec905b97ce`.
+  `2a74ac5c912cebf839bd3bf908249201eb62eb2d`;
+- `bombieri-vinogradov` theorem-code checkpoint
+  `380bc17efe7f63ad3e03921006cc520e3491225f`.
 
-Both dependency working trees had local changes when this child was created.
-The successful local build therefore establishes compatibility with those
-working trees, not reproducibility from the recorded commits. No theorem from
-the open Bombieri--Vinogradov headline is treated as proved. A reproducible
-release must replace the paths by clean, reviewed commit pins and repeat every
-build and axiom audit.
+The successful local proof replay uses isolated object trees at those current
+dependency revisions. The Bombieri--Vinogradov theorem-code checkpoint is
+finished; its separate final Comparator replay does not change the theorem
+dependency used here. A reproducible release must replace the local paths by
+clean, reviewed commit pins and repeat every build and axiom audit.
 
 The release state is visible mechanically:
 
