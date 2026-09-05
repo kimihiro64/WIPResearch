@@ -40,6 +40,7 @@ Replace the scaffold row when the first real candidate module is created.
 
 | Project module | Proposed Mathlib path | Readiness | Upstream reference |
 | --- | --- | --- | --- |
+| `RobinBV.Mathlib.Analysis.SpecialFunctions.Log.GeometricTail` | `Mathlib/Analysis/SpecialFunctions/Log/GeometricTail.lean` | project-verified | Exact shifted geometric-logarithm tail decomposition with a complete inverse-cutoff remainder bound and the resonant real sign; retains the position between consecutive powers |
 | `RobinBV.Mathlib.Analysis.Complex.LogDerivContinuation` | `Mathlib/Analysis/Complex/LogDerivContinuation.lean` | project-verified | Holomorphic continuation of a logarithmic derivative on an open connected domain forces nonvanishing of a nontrivial analytic function; exact finite-order pole and analytic-identity proof, with no simple-zero assumption |
 | `RobinBV.Mathlib.Analysis.MellinTail` | `Mathlib/Analysis/MellinTail.lean` | project-verified | Tail Mellin holomorphy from continuity on a positive closed tail and a power-decay bound, including zero-extension local integrability and absolute convergence with no artificial lower-strip restriction |
 | `RobinBV.Mathlib.MeasureTheory.Integral.TailSwap` | `Mathlib/MeasureTheory/Integral/TailSwap.lean` | project-verified | Complete RCLike triangular Fubini from two L1 factors, with integrability conclusions and the exact primitive boundary term; generalizes Robin1984 TailReweight at published commit `2a74ac5c912cebf839bd3bf908249201eb62eb2d` (Apache-2.0) to complex derivative factors |
