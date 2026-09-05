@@ -1,11 +1,8 @@
 import RobinBV.CA.Definitions.Distribution
 import RobinBV.CA.Helpers.LayerPartition
 import RobinBV.Mathlib
-import RobinBV.NumberField.Proof.CharacterChebyshevDecay
-import RobinBV.NumberField.Proof.DirichletGRHCriterion
+import RobinBV.NumberField.Assembly.DirichletCharacterResults
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
-import RobinBV.NumberField.Proof.MovingCharacterQuartic
-import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
 import RobinBV.NumberField.Proof.QuadraticDedekindNicolasOmega
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
 import RobinBV.NumberField.Proof.QuadraticPrimePowerLayers
@@ -34,6 +31,12 @@ are proved negligible at this scale. Under ERH of a nonprincipal cubic
 character power, a further quartic term has coefficient -2/3 at scale
 P^(3/2)*log(P) when the fourth power is principal, and zero otherwise.
 Its full higher-weight and root-prime ERH estimates cover both parities
-and imprimitive characters. No RH, ERH or GRH assertion is proved merely
+and imprimitive characters. More generally, for m+1 <= L < 2*(m+1),
+assuming nonprincipality and ERH for precisely the intervening powers,
+the exact-prefix residual has coefficient -L/(m*(L-1)) at scale
+P^(m*(L-1)/L)*log(P) when the L-th power is principal, and zero
+otherwise. This includes the actual centered integral difference and
+accounts for every cap correction and the complete higher-power tail.
+No RH, ERH or GRH assertion is proved merely
 by these equivalences or conditional correction estimates.
 -/
