@@ -37,6 +37,11 @@ the exact-prefix residual has coefficient -L/(m*(L-1)) at scale
 P^(m*(L-1)/L)*log(P) when the L-th power is principal, and zero
 otherwise. This includes the actual centered integral difference and
 accounts for every cap correction and the complete higher-power tail.
+Retaining the complete model integrals of earlier principal powers
+removes the intermediate nonprincipality restriction: ERH of those
+powers alone gives the same selected coefficient. Its principal input
+is proved from Robin's full rational higher-weight bounds under RH,
+with complete prime-power and conductor corrections.
 No RH, ERH or GRH assertion is proved merely
 by these equivalences or conditional correction estimates.
 -/
