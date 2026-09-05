@@ -91,6 +91,33 @@ theorem norm_imprimitiveChebyshevStep_mul_weight_le
         exact Real.rpow_nonneg htPos.le _
     _ = _ := by ring
 
+/-- The weighted Chebyshev difference is integrable for every character,
+including principal characters. This does not split either divergent
+uncentered principal endpoint integral. -/
+theorem integrableOn_imprimitiveChebyshevStep_mul_weight
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    {x : Real} (hx : 3 <= x) :
+    IntegrableOn (fun t : Real =>
+      (characterChebyshevSum (Nat.floor t) chi -
+        characterChebyshevSum (Nat.floor t) chi.primitiveCharacter) *
+          (Robin1984.robinRealWeight 1 t : Complex)) (Ioi x) := by
+  have hxPos : 0 < x := by linarith
+  let C : Real := Real.log N / Real.log 2 * (1 + 1 / Real.log x)
+  have hMajor : IntegrableOn (fun t : Real => C * t ^ (-2 : Real)) (Ioi x) :=
+    (integrableOn_Ioi_rpow_of_lt (by norm_num : (-2 : Real) < -1) hxPos).const_mul C
+  have hFirst : Measurable (fun t : Real => characterChebyshevSum (Nat.floor t) chi) :=
+    (measurable_of_countable (fun k : Nat => characterChebyshevSum k chi)).comp Nat.measurable_floor
+  have hSecond : Measurable
+      (fun t : Real => characterChebyshevSum (Nat.floor t) chi.primitiveCharacter) :=
+    (measurable_of_countable (fun k : Nat =>
+      characterChebyshevSum k chi.primitiveCharacter)).comp Nat.measurable_floor
+  have hWeight : Measurable (fun t : Real => (Robin1984.robinRealWeight 1 t : Complex)) := by
+    unfold Robin1984.robinRealWeight
+    fun_prop
+  apply hMajor.mono' ((hFirst.sub hSecond).mul hWeight).aestronglyMeasurable
+  filter_upwards [ae_restrict_mem measurableSet_Ioi] with t ht
+  exact norm_imprimitiveChebyshevStep_mul_weight_le chi hx ht.le
+
 /-- An unconditional explicit inverse-cutoff estimate for the actual complete
 change-of-level endpoint correction. -/
 theorem norm_dirichletWeightedIntegral_sub_primitive_le

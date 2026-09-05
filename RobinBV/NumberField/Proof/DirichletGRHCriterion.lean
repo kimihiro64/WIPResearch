@@ -1,6 +1,5 @@
-import RobinBV.NumberField.Proof.ImprimitiveCriticalCriterion
+import RobinBV.NumberField.Proof.PrincipalCharacterAsymptotic
 import RobinBV.NumberField.Proof.PrincipalCharacterZeros
-import RobinBV.NumberField.Proof.RiemannCriticalCriterion
 
 /-!
 # A critical integral criterion for full Dirichlet GRH
@@ -60,6 +59,31 @@ theorem fullDirichletGRH_iff_criticalIntegralCriteria :
       let : NeZero chi.conductor := NeZero.mk chi.conductor_ne_zero
       exact (dirichletERH_iff_imprimitivePairedCriticalBound chi hchi).2
         (hBounds.2 N chi hchi)
+
+/-- The complete family stated entirely with actual ambient tails: centered
+principal integrals at every positive modulus and paired nonprincipal
+integrals for every complex character. The quantifiers are fixed-level,
+not a uniform claim for a modulus chosen as a function of the cutoff. -/
+def FullCenteredDirichletCriticalBounds : Prop :=
+  And (forall (N : Nat) [NeZero N], PrincipalCenteredCriticalBound N)
+    (forall (N : Nat) [NeZero N] (chi : DirichletCharacter Complex N),
+      letI : NeZero chi.conductor := NeZero.mk chi.conductor_ne_zero
+      Not (chi = 1) -> ImprimitivePairedDirichletCriticalBound chi)
+
+/-- Full Dirichlet GRH is equivalent to the exact-mass critical family of
+actual ambient integrals, including correctly centered principal tails. -/
+theorem fullDirichletGRH_iff_centeredCriticalIntegralCriteria :
+    FullDirichletGRH <-> FullCenteredDirichletCriticalBounds := by
+  rw [fullDirichletGRH_iff_criticalIntegralCriteria]
+  unfold FullDirichletCriticalBounds FullCenteredDirichletCriticalBounds
+  apply and_congr _ Iff.rfl
+  constructor
+  next =>
+    intro hBound N inst
+    exact principalCenteredCriticalBound_iff_riemannCriticalBound.2 hBound
+  next =>
+    intro hBound
+    exact (principalCenteredCriticalBound_iff_riemannCriticalBound (N := 1)).1 (hBound 1)
 
 end
 

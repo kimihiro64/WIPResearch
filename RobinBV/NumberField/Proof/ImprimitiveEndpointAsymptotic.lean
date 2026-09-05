@@ -145,14 +145,16 @@ theorem log_mul_robinRealWeight_one_integral_data
       _ = _ := by rw [integral_const_mul, hPowIntegral]; ring
   exact And.intro hFull (And.intro hIdentity (And.intro hNonneg hBound))
 
-/-- Explicit resonant leading term for the actual complete conductor
-correction. The coefficient is the exact count of resonant excluded primes,
-and the full remainder has a stated constant without ERH. -/
-theorem norm_dirichletWeightedIntegral_sub_primitive_add_resonance_div_le
+/-- Explicit resonant leading term for the directly integrable complete
+conductor correction, including principal characters. The coefficient is the
+exact count of resonant excluded primes. No ERH or nonprincipality is assumed. -/
+theorem norm_integral_imprimitiveChebyshevStep_add_resonance_div_le
     {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
-    [NeZero chi.conductor] (hchi : Not (chi = 1)) {x : Real} (hx : 3 <= x) :
-    norm (dirichletCharacterWeightedIntegral chi 1 x -
-      dirichletCharacterWeightedIntegral chi.primitiveCharacter 1 x +
+    {x : Real} (hx : 3 <= x) :
+    norm (integral (volume.restrict (Ioi x)) (fun t : Real =>
+      (characterChebyshevSum (Nat.floor t) chi -
+        characterChebyshevSum (Nat.floor t) chi.primitiveCharacter) *
+          (Robin1984.robinRealWeight 1 t : Complex)) +
         (imprimitiveResonanceCount chi : Complex) / (x : Complex)) <=
       (imprimitiveStepErrorBound chi + (imprimitiveResonanceCount chi : Real)) /
         (x * Real.log x) := by
@@ -161,6 +163,10 @@ theorem norm_dirichletWeightedIntegral_sub_primitive_add_resonance_div_le
   have hLogX : 0 < Real.log x := Real.log_pos hxOne
   let r : Nat := imprimitiveResonanceCount chi
   let C : Real := imprimitiveStepErrorBound chi
+  let D : Complex := integral (volume.restrict (Ioi x)) (fun t : Real =>
+    (characterChebyshevSum (Nat.floor t) chi -
+      characterChebyshevSum (Nat.floor t) chi.primitiveCharacter) *
+        (Robin1984.robinRealWeight 1 t : Complex))
   let L : Real := integral (volume.restrict (Ioi x)) (fun t : Real =>
     Real.log t * Robin1984.robinRealWeight 1 t)
   let E : Real -> Complex := fun t =>
@@ -171,24 +177,12 @@ theorem norm_dirichletWeightedIntegral_sub_primitive_add_resonance_div_le
   have hLogData := log_mul_robinRealWeight_one_integral_data hx
   have hWeight := Robin1984.integrableOn_robinRealWeight
     (by norm_num : 1 <= (1 : Nat)) hxOne
-  have hPrimitive := BombieriVinogradov.DirichletCharacter.primitiveCharacter_ne_one_of_ne_one
-    chi hchi
-  have hFirst := (integrableOn_characterChebyshevStep_mul_weight_one chi hchi).mono_set
-    (Ioi_subset_Ioi hx)
-  have hSecond := (integrableOn_characterChebyshevStep_mul_weight_one
-    chi.primitiveCharacter hPrimitive).mono_set (Ioi_subset_Ioi hx)
-  have hDifference : IntegrableOn (fun t : Real =>
-      (characterChebyshevSum (Nat.floor t) chi -
-        characterChebyshevSum (Nat.floor t) chi.primitiveCharacter) *
-          (Robin1984.robinRealWeight 1 t : Complex)) (Ioi x) := by
-    simpa only [sub_mul, Pi.sub_apply] using! hFirst.sub hSecond
+  have hDifference := integrableOn_imprimitiveChebyshevStep_mul_weight chi hx
   have hLogComplex : IntegrableOn (fun t : Real =>
       (r : Complex) * ((Real.log t * Robin1984.robinRealWeight 1 t : Real) : Complex)) (Ioi x) :=
     hLogData.1.ofReal.const_mul (r : Complex)
   have hIntegral : integral (volume.restrict (Ioi x)) E =
-      dirichletCharacterWeightedIntegral chi 1 x -
-        dirichletCharacterWeightedIntegral chi.primitiveCharacter 1 x +
-          (r : Complex) * (L : Complex) := by
+      D + (r : Complex) * (L : Complex) := by
     calc
       _ = integral (volume.restrict (Ioi x)) (fun t : Real =>
           (characterChebyshevSum (Nat.floor t) chi -
@@ -200,8 +194,7 @@ theorem norm_dirichletWeightedIntegral_sub_primitive_add_resonance_div_le
         push_cast
         ring
       _ = _ := by
-        rw [integral_add hDifference hLogComplex, integral_const_mul, integral_complex_ofReal,
-          <- dirichletWeightedIntegral_sub_primitive_eq chi hchi hx]
+        rw [integral_add hDifference hLogComplex, integral_const_mul, integral_complex_ofReal]
   have hNorm : norm (integral (volume.restrict (Ioi x)) E) <= C / (x * Real.log x) := by
     have hMajor := hWeight.const_mul C
     have hBound := norm_integral_le_of_norm_le hMajor
@@ -233,20 +226,31 @@ theorem norm_dirichletWeightedIntegral_sub_primitive_add_resonance_div_le
       _ <= (r : Real) * (1 / (x * Real.log x)) :=
         mul_le_mul_of_nonneg_left hGapLe (Nat.cast_nonneg r)
       _ = _ := by ring
-  have hIdentity : dirichletCharacterWeightedIntegral chi 1 x -
-      dirichletCharacterWeightedIntegral chi.primitiveCharacter 1 x + (r : Complex) / (x : Complex) =
+  have hIdentity : D + (r : Complex) / (x : Complex) =
       integral (volume.restrict (Ioi x)) E - (((r : Real) * (L - 1 / x) : Real) : Complex) := by
     rw [hIntegral]
     push_cast
     ring
-  change norm (dirichletCharacterWeightedIntegral chi 1 x -
-    dirichletCharacterWeightedIntegral chi.primitiveCharacter 1 x + (r : Complex) / (x : Complex)) <= _
+  change norm (D + (r : Complex) / (x : Complex)) <= _
   rw [hIdentity]
   calc
     _ <= norm (integral (volume.restrict (Ioi x)) E) +
         norm ((((r : Real) * (L - 1 / x) : Real) : Complex)) := norm_sub_le _ _
     _ <= C / (x * Real.log x) + (r : Real) / (x * Real.log x) := add_le_add hNorm hResidual
     _ = _ := by dsimp only [C, r]; ring
+
+/-- Explicit resonant leading term for the actual complete nonprincipal
+conductor correction, obtained from the all-character integral estimate. -/
+theorem norm_dirichletWeightedIntegral_sub_primitive_add_resonance_div_le
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N)
+    [NeZero chi.conductor] (hchi : Not (chi = 1)) {x : Real} (hx : 3 <= x) :
+    norm (dirichletCharacterWeightedIntegral chi 1 x -
+      dirichletCharacterWeightedIntegral chi.primitiveCharacter 1 x +
+        (imprimitiveResonanceCount chi : Complex) / (x : Complex)) <=
+      (imprimitiveStepErrorBound chi + (imprimitiveResonanceCount chi : Real)) /
+        (x * Real.log x) := by
+  rw [dirichletWeightedIntegral_sub_primitive_eq chi hchi hx]
+  exact norm_integral_imprimitiveChebyshevStep_add_resonance_div_le chi hx
 
 /-- The paired conductor correction has leading term -2r/x, with the full
 explicit single-character remainder doubled by exact complex conjugation. -/
