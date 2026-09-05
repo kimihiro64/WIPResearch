@@ -51,6 +51,7 @@ Replace the scaffold row when the first real candidate module is created.
 | `RobinBV.Mathlib.NumberTheory.NumberField.QuadraticZetaFactorization` | `Mathlib/NumberTheory/NumberField/QuadraticZetaFactorization.lean` | project-verified | Counts ideals of every prime-power and positive norm, identifies the ideal-counting arithmetic function with the zeta-character convolution, and proves the quadratic Dedekind zeta factorization on `re(s) > 1` |
 
 | `RobinBV.Mathlib.NumberTheory.PrimeSieve.Owner` | `Mathlib/NumberTheory/PrimeSieve/Owner.lean` | project-verified | Extracts the finite least-prime owner partition from original robin commit `b6a7dff5f9546131cf668a9c8bfa436f4650bc0d`; preserves arbitrary additive weights and full owner packets |
+| `RobinBV.Mathlib.NumberTheory.PrimeSieve.Progression` | `Mathlib/NumberTheory/PrimeSieve/Progression.lean` | project-verified | Exact weighted owner-to-cofactor progression transport with gcd-adjusted modulus and a proved local obstruction for inadmissible classes |
 | `RobinBV.Mathlib.NumberTheory.PrimeSieve.Scaled` | `Mathlib/NumberTheory/PrimeSieve/Scaled.lean` | project-verified | Exact dilation of an owner packet to its rough cofactors, including cofactor one and repeated owner-prime powers; same original robin revision |
 | `RobinBV.Mathlib.NumberTheory.PrimeSieve.Weighted` | `Mathlib/NumberTheory/PrimeSieve/Weighted.lean` | project-verified | Generalizes the complete owner telescope from local density `1/p` to arbitrary `g(p)`; proves a complete future-weighted error budget and contraction for densities in `[0,1]` |
 
@@ -61,7 +62,7 @@ standalone build against the project's pinned Mathlib revision.
 
 ## Least-prime owner source provenance
 
-The three `PrimeSieve` modules extract only the project-independent closure of
+The `Owner`, `Scaled`, and `Weighted` modules extract only the project-independent closure of
 `CF4ClockSieve`, `ExactLeastPrimeOwnerStage`,
 `ExactLeastPrimeOwnerScaledTelescope`, and the complete recurrence in
 `ExactLeastPrimeOwnerDefect` from the original `robin` repository at commit
