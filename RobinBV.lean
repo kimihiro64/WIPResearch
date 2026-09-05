@@ -3,8 +3,7 @@ import RobinBV.CA.Helpers.LayerPartition
 import RobinBV.Mathlib
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
-import RobinBV.NumberField.Proof.PairedDirichletCriticalBound
-import RobinBV.NumberField.Proof.PairedDirichletMellinIdentity
+import RobinBV.NumberField.Proof.PairedDirichletMellinContinuation
 import RobinBV.NumberField.Proof.QuadraticDedekindERHLogDefect
 import RobinBV.NumberField.Proof.QuadraticDedekindNicolasOmega
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
