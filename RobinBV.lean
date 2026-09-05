@@ -2,9 +2,8 @@ import RobinBV.CA.Definitions.Distribution
 import RobinBV.CA.Helpers.LayerPartition
 import RobinBV.Mathlib
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
-import RobinBV.NumberField.Proof.DirichletCharacterReweight
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
-import RobinBV.NumberField.Proof.PairedDirichletWeightedFormula
+import RobinBV.NumberField.Proof.PairedDirichletEndpoint
 import RobinBV.NumberField.Proof.QuadraticDedekindERHLogDefect
 import RobinBV.NumberField.Proof.QuadraticDedekindNicolasOmega
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
