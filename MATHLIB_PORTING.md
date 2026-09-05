@@ -50,7 +50,25 @@ Replace the scaffold row when the first real candidate module is created.
 | `RobinBV.Mathlib.NumberTheory.NumberField.QuadraticZetaPrimePowers` | `Mathlib/NumberTheory/NumberField/QuadraticZetaPrimePowers.lean` | project-verified | Counts splitting exponent vectors and proves the geometric-sum formula for every prime-power ideal-counting coefficient |
 | `RobinBV.Mathlib.NumberTheory.NumberField.QuadraticZetaFactorization` | `Mathlib/NumberTheory/NumberField/QuadraticZetaFactorization.lean` | project-verified | Counts ideals of every prime-power and positive norm, identifies the ideal-counting arithmetic function with the zeta-character convolution, and proves the quadratic Dedekind zeta factorization on `re(s) > 1` |
 
+| `RobinBV.Mathlib.NumberTheory.PrimeSieve.Owner` | `Mathlib/NumberTheory/PrimeSieve/Owner.lean` | project-verified | Extracts the finite least-prime owner partition from original robin commit `b6a7dff5f9546131cf668a9c8bfa436f4650bc0d`; preserves arbitrary additive weights and full owner packets |
+| `RobinBV.Mathlib.NumberTheory.PrimeSieve.Scaled` | `Mathlib/NumberTheory/PrimeSieve/Scaled.lean` | project-verified | Exact dilation of an owner packet to its rough cofactors, including cofactor one and repeated owner-prime powers; same original robin revision |
+| `RobinBV.Mathlib.NumberTheory.PrimeSieve.Weighted` | `Mathlib/NumberTheory/PrimeSieve/Weighted.lean` | project-verified | Generalizes the complete owner telescope from local density `1/p` to arbitrary `g(p)`; proves a complete future-weighted error budget and contraction for densities in `[0,1]` |
+
 Readiness should be one of: `extracting`, `project-verified`, `mathlib-ready`,
 `submitted`, or `upstreamed`. A module is `mathlib-ready` only after it has an
 identified destination, no project dependency, focused tests, and a clean
 standalone build against the project's pinned Mathlib revision.
+
+## Least-prime owner source provenance
+
+The three `PrimeSieve` modules extract only the project-independent closure of
+`CF4ClockSieve`, `ExactLeastPrimeOwnerStage`,
+`ExactLeastPrimeOwnerScaledTelescope`, and the complete recurrence in
+`ExactLeastPrimeOwnerDefect` from the original `robin` repository at commit
+`b6a7dff5f9546131cf668a9c8bfa436f4650bc0d`. The source file blobs were verified
+against that commit and the source root toolchain matches Lean 4.33.1.
+No original-repository import or dependency is added. The original code is
+copyright 2026 Jonas Whidden under MIT; its full permission notice is retained
+in each adapted module, which is distributed under Apache-2.0 for this
+candidate layer. This is reuse plus a local-density generalization, not a
+claim of a new classical Buchstab identity or an RH proof.
