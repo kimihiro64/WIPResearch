@@ -47,6 +47,13 @@ root's prime-power correction. Retaining the entire first-root Chebyshev
 tail yields a vanishing normalized residual, with ERH needed only for
 the strictly later intervening powers. No constant or sign is assigned
 to the retained first-root contribution.
+Under ERH for the first power as well, its exact leading term is the
+complete canonical zero series with coefficient +(m+1)/m and phase
+P^(m*(rho-1/2)/(m+1))/(rho*(m+1-rho)). Principal powers use the
+actual zeta divisor; the other powers use their canonical primitive
+completed-L divisor. Every central zero and multiplicity is retained.
+The full zero-kernel leading error has an explicit inverse-logarithmic
+bound with the actual inverse-square zero mass.
 No RH, ERH or GRH assertion is proved merely
 by these equivalences or conditional correction estimates.
 -/

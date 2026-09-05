@@ -1,6 +1,6 @@
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.DirichletGRHCriterion
-import RobinBV.NumberField.Proof.MovingCharacterBoundary
+import RobinBV.NumberField.Proof.MovingCharacterBoundaryZeros
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
@@ -15,4 +15,6 @@ secondary resonance hierarchy under the stated intervening-power ERH.
 The exact-model extension includes every principal intermediate power.
 At the doubled-layer boundary the full first-root Chebyshev contribution
 is retained and the doubled arithmetic layer cancels exactly.
+Its complete canonical zero-series leading term includes every parity,
+conductor correction, central zero and multiplicity.
 -/
