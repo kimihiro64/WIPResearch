@@ -42,6 +42,11 @@ removes the intermediate nonprincipality restriction: ERH of those
 powers alone gives the same selected coefficient. Its principal input
 is proved from Robin's full rational higher-weight bounds under RH,
 with complete prime-power and conductor corrections.
+At L=2*(m+1), the doubled arithmetic layer cancels against the first
+root's prime-power correction. Retaining the entire first-root Chebyshev
+tail yields a vanishing normalized residual, with ERH needed only for
+the strictly later intervening powers. No constant or sign is assigned
+to the retained first-root contribution.
 No RH, ERH or GRH assertion is proved merely
 by these equivalences or conditional correction estimates.
 -/

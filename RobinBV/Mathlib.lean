@@ -2,7 +2,7 @@ import RobinBV.Mathlib.Analysis.Complex.LogDerivContinuation
 import RobinBV.Mathlib.Analysis.MellinTail
 import RobinBV.Mathlib.MeasureTheory.Integral.TailSwap
 import RobinBV.Mathlib.NumberTheory.DirichletCharacter.FiniteEulerProduct
-import RobinBV.Mathlib.NumberTheory.DirichletCharacter.PrimePowerRemainder
+import RobinBV.Mathlib.NumberTheory.DirichletCharacter.PrimePowerSquareRemainder
 import RobinBV.Mathlib.NumberTheory.NumberField.Ideal.Factorization
 import RobinBV.Mathlib.NumberTheory.NumberField.QuadraticZeta
 import RobinBV.Mathlib.NumberTheory.NumberField.QuadraticZetaFactorization
