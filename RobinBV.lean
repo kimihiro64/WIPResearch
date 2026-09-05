@@ -4,6 +4,7 @@ import RobinBV.Mathlib
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
 import RobinBV.NumberField.Proof.ImprimitiveCriticalCriterion
+import RobinBV.NumberField.Proof.ImprimitivePrimePowerEndpoint
 import RobinBV.NumberField.Proof.QuadraticDedekindERHLogDefect
 import RobinBV.NumberField.Proof.QuadraticDedekindNicolasOmega
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
