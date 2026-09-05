@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
 import Mathlib.Algebra.Order.Floor.Ring
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Nat.Log
 
 /-!
@@ -18,6 +18,17 @@ smaller than the logarithm of the base, including at exact powers.
 set_option autoImplicit false
 
 namespace Nat
+
+/-- Admitting a positive integer power at a real cutoff is exactly the
+same as admitting its base at the corresponding real root cutoff. -/
+theorem pow_le_floor_iff_le_floor_root
+    {p k : Nat} (hk : 0 < k) {t : Real} (ht : 0 <= t) :
+    p ^ k <= Nat.floor t <-> p <= Nat.floor (t ^ (Inv.inv (k : Real))) := by
+  rw [Nat.le_floor_iff ht, Nat.le_floor_iff (Real.rpow_nonneg ht _), Nat.cast_pow]
+  have hkReal : (0 : Real) < (k : Real) := by exact_mod_cast hk
+  simpa only [Real.rpow_natCast] using
+    (Real.le_rpow_inv_iff_of_pos (x := (p : Real)) (y := t) (z := (k : Real))
+      (Nat.cast_nonneg p) ht hkReal).symm
 
 /-- The selected integer power is at or below the actual real cutoff. -/
 theorem pow_log_floor_le {b : Nat} {t : Real} (ht : 1 <= t) :

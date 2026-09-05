@@ -5,6 +5,7 @@ import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.DirichletGRHCriterion
 import RobinBV.NumberField.Proof.IdealCALocalThreshold
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
+import RobinBV.NumberField.Proof.MovingCharacterSecondary
 import RobinBV.NumberField.Proof.QuadraticDedekindNicolasOmega
 import RobinBV.NumberField.Proof.QuadraticIdealNicolasAsymptoticTransfer
 import RobinBV.NumberField.Proof.QuadraticPrimePowerLayers
@@ -25,6 +26,10 @@ an unconditional principal-power coefficient at every positive integer power
 scale and at arbitrary real square-root cutoffs. It is exactly the difference of actual centered character integrals
 at the original and primorial-enlarged lcm levels. Its square-scale critical
 shift is -2 for principal, -1 for nonprincipal quadratic, and zero for
-higher-order characters. No RH, ERH or GRH assertion is proved merely by
+higher-order characters. After retaining the first m finite prime moments
+exactly, the first omitted layer has coefficient -(m+1)/m^2 at scale
+P^(m^2/(m+1))*log(P) precisely when the (m+1)-st character power is
+principal, and zero otherwise. Every higher layer and the full cap error
+are proved negligible at this scale. No RH, ERH or GRH assertion is proved merely by
 these equivalences or correction estimates.
 -/
