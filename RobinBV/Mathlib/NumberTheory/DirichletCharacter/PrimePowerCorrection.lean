@@ -94,6 +94,83 @@ theorem sum_vonMangoldt_mul_sub_primitive_eq
   rw [ArithmeticFunction.vonMangoldt_apply_pow hkNe,
     ArithmeticFunction.vonMangoldt_apply_prime hpPrime, Nat.cast_pow, map_pow]
 
+/-- Raising the level to the least common multiple removes exactly the
+arguments noncoprime to the new factor, including arguments already killed
+by the original character. -/
+theorem changeLevel_lcm_natCast_sub {N M : Nat}
+    (chi : DirichletCharacter Complex N) (n : Nat) :
+    chi.changeLevel (Nat.dvd_lcm_left N M) (n : ZMod (Nat.lcm N M)) - chi (n : ZMod N) =
+      if Nat.Coprime n M then 0 else -chi (n : ZMod N) := by
+  by_cases hM : Nat.Coprime n M
+  case pos =>
+    rw [if_pos hM]
+    by_cases hN : Nat.Coprime n N
+    case pos =>
+      have hQ : Nat.Coprime n (Nat.lcm N M) :=
+        Nat.Coprime.of_dvd_right (Nat.lcm_dvd_mul N M) (hN.mul_right hM)
+      have hValue := chi.changeLevel_eq_cast_of_dvd' (Nat.dvd_lcm_left N M)
+        (Nat.isCoprime_iff_coprime.mpr hQ)
+      have hNat : chi.changeLevel (Nat.dvd_lcm_left N M) (n : ZMod (Nat.lcm N M)) =
+          chi (n : ZMod N) := by simpa only [Int.cast_natCast] using hValue
+      rw [hNat, sub_self]
+    case neg =>
+      have hZero : chi (n : ZMod N) = 0 :=
+        chi.map_nonunit (fun hUnit => hN ((ZMod.isUnit_iff_coprime n N).mp hUnit))
+      have hNewZero : chi.changeLevel (Nat.dvd_lcm_left N M) (n : ZMod (Nat.lcm N M)) = 0 :=
+        (chi.changeLevel (Nat.dvd_lcm_left N M)).map_nonunit (fun hUnit => hN
+          (Nat.Coprime.of_dvd_right (Nat.dvd_lcm_left N M)
+            ((ZMod.isUnit_iff_coprime n (Nat.lcm N M)).mp hUnit)))
+      rw [hZero, hNewZero, sub_self]
+  case neg =>
+    rw [if_neg hM]
+    have hNewZero : chi.changeLevel (Nat.dvd_lcm_left N M) (n : ZMod (Nat.lcm N M)) = 0 :=
+      (chi.changeLevel (Nat.dvd_lcm_left N M)).map_nonunit (fun hUnit => hM
+        (Nat.Coprime.of_dvd_right (Nat.dvd_lcm_right N M)
+          ((ZMod.isUnit_iff_coprime n (Nat.lcm N M)).mp hUnit)))
+    rw [hNewZero, zero_sub]
+
+/-- Complete finite Mangoldt deletion at a least-common-multiple level.
+All positive powers of all prime factors of the added level are retained;
+primes already excluded by the original level have zero character weight. -/
+theorem sum_vonMangoldt_mul_changeLevel_lcm_sub
+    {N M : Nat} [NeZero M] (chi : DirichletCharacter Complex N) (x : Nat) :
+    Finset.sum (Finset.Icc 1 x) (fun n => (ArithmeticFunction.vonMangoldt n : Complex) *
+      (chi.changeLevel (Nat.dvd_lcm_left N M) (n : ZMod (Nat.lcm N M)) - chi (n : ZMod N))) =
+        -Finset.sum M.primeFactors (fun p => (Real.log p : Complex) *
+          Finset.sum (Finset.Icc 1 (Nat.log p x)) (fun j => chi (p : ZMod N) ^ j)) := by
+  classical
+  let f : Nat -> Complex := fun n => (ArithmeticFunction.vonMangoldt n : Complex) * chi (n : ZMod N)
+  have hSupport : forall n : Nat, Not (IsPrimePow n) -> f n = 0 := by
+    intro n hn
+    dsimp only [f]
+    rw [ArithmeticFunction.vonMangoldt_eq_zero_iff.mpr hn]
+    simp
+  have hPoint (n : Nat) : (ArithmeticFunction.vonMangoldt n : Complex) *
+      (chi.changeLevel (Nat.dvd_lcm_left N M) (n : ZMod (Nat.lcm N M)) - chi (n : ZMod N)) =
+        -(if Nat.Coprime n M then 0 else f n) := by
+    rw [changeLevel_lcm_natCast_sub]
+    by_cases hn : Nat.Coprime n M
+    case pos =>
+      rw [if_pos hn, if_pos hn]
+      simp
+    case neg =>
+      rw [if_neg hn, if_neg hn]
+      exact mul_neg _ _
+  simp_rw [hPoint]
+  rw [Finset.sum_neg_distrib,
+    Nat.sum_nonCoprime_eq_sum_primeFactors_sum_pow f hSupport (NeZero.ne M) x]
+  congr 1
+  apply Finset.sum_congr rfl
+  intro p hp
+  rw [Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro j hj
+  have hPrime := Nat.prime_of_mem_primeFactors hp
+  have hjNe : Not (j = 0) := by have h := (Finset.mem_Icc.mp hj).1; omega
+  dsimp only [f]
+  rw [ArithmeticFunction.vonMangoldt_apply_pow hjNe,
+    ArithmeticFunction.vonMangoldt_apply_prime hPrime, Nat.cast_pow, map_pow]
+
 /-- Dividing a character value by a prime puts the local ratio strictly
 inside the unit disk, including nonunit character arguments. -/
 theorem norm_primeRatio_lt_one
@@ -134,6 +211,57 @@ def primePowerChebyshevStep {N : Nat} (chi : DirichletCharacter Complex N)
     (p : Nat) (t : Real) : Complex :=
   (Real.log p : Complex) * Finset.sum (Finset.Icc 1 (Nat.log p (Nat.floor t)))
     (fun k => chi (p : ZMod N) ^ k)
+
+/-- After any admitted prefix is removed exactly, the complete complex
+prime-power remainder is bounded by the corresponding positive count.
+The character power indices remain positive even at nonunit arguments. -/
+theorem norm_primePowerChebyshevStep_sub_prefix_le
+    {N : Nat} (chi : DirichletCharacter Complex N) {p : Nat} (hp : Nat.Prime p)
+    {t : Real} {m : Nat} (hm : m <= Nat.log p (Nat.floor t)) :
+    norm (chi.primePowerChebyshevStep p t -
+      (Real.log p : Complex) * Finset.sum (Finset.Icc 1 m)
+        (fun j => chi (p : ZMod N) ^ j)) <=
+      Real.log p * ((Nat.log p (Nat.floor t) : Real) - (m : Real)) := by
+  let K : Nat := Nat.log p (Nat.floor t)
+  have hSub : Finset.Icc 1 m <= Finset.Icc 1 K := by
+    intro j hj
+    have hJ := Finset.mem_Icc.mp hj
+    exact Finset.mem_Icc.mpr (And.intro hJ.1 (hJ.2.trans hm))
+  have hDecomp := Finset.sum_sdiff (f := fun j => chi (p : ZMod N) ^ j) hSub
+  have hSumEq : Finset.sum (Finset.Icc 1 K) (fun j => chi (p : ZMod N) ^ j) -
+      Finset.sum (Finset.Icc 1 m) (fun j => chi (p : ZMod N) ^ j) =
+      Finset.sum (SDiff.sdiff (Finset.Icc 1 K) (Finset.Icc 1 m))
+        (fun j => chi (p : ZMod N) ^ j) := by
+    rw [<- hDecomp]
+    ring
+  have hCard : (SDiff.sdiff (Finset.Icc 1 K) (Finset.Icc 1 m)).card = K - m := by
+    rw [Finset.card_sdiff, Finset.inter_eq_left.mpr hSub]
+    simp [Nat.card_Icc]
+  have hSumBound : norm (Finset.sum (Finset.Icc 1 K) (fun j => chi (p : ZMod N) ^ j) -
+      Finset.sum (Finset.Icc 1 m) (fun j => chi (p : ZMod N) ^ j)) <= (K : Real) - (m : Real) := by
+    rw [hSumEq]
+    calc
+      _ <= Finset.sum (SDiff.sdiff (Finset.Icc 1 K) (Finset.Icc 1 m))
+          (fun j => norm (chi (p : ZMod N) ^ j)) := norm_sum_le _ _
+      _ <= Finset.sum (SDiff.sdiff (Finset.Icc 1 K) (Finset.Icc 1 m)) (fun _ => (1 : Real)) := by
+        apply Finset.sum_le_sum
+        intro j hj
+        simpa only [map_pow] using chi.norm_le_one ((p : ZMod N) ^ j)
+      _ = ((K - m : Nat) : Real) := by simp [hCard]
+      _ = _ := Nat.cast_sub hm
+  have hLog : 0 <= Real.log p := Real.log_nonneg (by exact_mod_cast hp.one_le)
+  unfold primePowerChebyshevStep
+  rw [<- mul_sub, norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hLog]
+  exact mul_le_mul_of_nonneg_left hSumBound hLog
+
+/-- The full complex prime-power step is dominated by its complete positive
+logarithmic-floor contribution, including an empty cutoff. -/
+theorem norm_primePowerChebyshevStep_le_logFloor
+    {N : Nat} (chi : DirichletCharacter Complex N) {p : Nat} (hp : Nat.Prime p) (t : Real) :
+    norm (chi.primePowerChebyshevStep p t) <=
+      Real.log p * (Nat.log p (Nat.floor t) : Real) := by
+  have h := chi.norm_primePowerChebyshevStep_sub_prefix_le hp (m := 0) (t := t) (Nat.zero_le _)
+  simpa using h
 
 /-- Resonance counts exactly character value one; zero and every other
 character value contribute zero to the logarithmic main term. -/
