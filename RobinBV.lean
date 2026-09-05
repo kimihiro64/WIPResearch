@@ -53,7 +53,11 @@ P^(m*(rho-1/2)/(m+1))/(rho*(m+1-rho)). Principal powers use the
 actual zeta divisor; the other powers use their canonical primitive
 completed-L divisor. Every central zero and multiplicity is retained.
 The full zero-kernel leading error has an explicit inverse-logarithmic
-bound with the actual inverse-square zero mass.
+bound with the actual shifted inverse-square mass M_n <= Z. This mass
+equals Re(F'/F(n))/(n-1/2) for the actual symmetric completion under
+ERH, or xi under RH. The full leading amplitude is bounded by
+n*sqrt(Z*M_n), and the actual weighted arithmetic integrals inherit
+this refinement with every parity and trivial-zero correction retained.
 No RH, ERH or GRH assertion is proved merely
 by these equivalences or conditional correction estimates.
 -/
