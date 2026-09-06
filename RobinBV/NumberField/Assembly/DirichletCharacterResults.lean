@@ -1,9 +1,9 @@
+import RobinBV.NumberField.Proof.CharacterBoundaryOscillation
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
-import RobinBV.NumberField.Proof.ResonantBoundaryUniversality
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -32,10 +32,14 @@ correction remains explicit. Subtracting the exact canonical central mean
 gives the actual centered variance and its nonnegative real part.
 For every principal character and every m>=1, RH implies strictly positive
 actual second moment and arbitrarily late norm excursions at every smaller
-squared amplitude. Thus the normalized principal residual does not tend to
-zero; no assertion of both signs is included in this magnitude result.
+squared amplitude. Thus the normalized principal residual does not tend to zero.
 At every resonant layer chi^(m+1)=1, the complete profile differs from
 the principal profile by a vanishing quantity, even for nonreal characters.
 Full Dirichlet GRH supplies cofinal fixed sharp layers for every character.
 Balanced finite resonant combinations cancel the entire leading fluctuation.
+The actual principal residual is real at every cutoff; complete zero-series
+control proves actual boundary boundedness. Zero mean and positive full
+second moment then give recurrent excursions of both signs, without LI or
+simple zeros. Resonant nonreal characters are asymptotically real and inherit
+these two signed excursions. Full GRH gives cofinal fixed signed layers.
 -/
