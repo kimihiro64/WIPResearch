@@ -1,5 +1,5 @@
-import RobinBV.NumberField.Proof.CharacterBoundaryOscillation
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
+import RobinBV.NumberField.Proof.MovingCharacterBoundaryCovariance
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
@@ -42,4 +42,9 @@ control proves actual boundary boundedness. Zero mean and positive full
 second moment then give recurrent excursions of both signs, without LI or
 simple zeros. Resonant nonreal characters are asymptotically real and inherit
 these two signed excursions. Full GRH gives cofinal fixed signed layers.
+For arbitrary pairs of characters, positive moduli and fixed layers, the
+complete conjugate-product mean is the canonical scaled-frequency pair sum
+divided by the two layer indices. Every cross-family coincidence is retained.
+Centering subtracts the product of the actual central-multiplicity means;
+no zero-family independence, disjointness or moving-layer limit is assumed.
 -/

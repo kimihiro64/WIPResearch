@@ -178,6 +178,77 @@ theorem tendsto_criticalLinePowerSum_secondMoment {I : Type*} [Countable I]
   dsimp only [omega]
   rw [exponentialSeries_eq_criticalLinePowerSum rho c hRe k m hP]
 
+/-- Complete covariance for two critical-line families on independently
+scaled power clocks. Every scaled imaginary-frequency coincidence remains. -/
+theorem tendsto_criticalLinePowerSum_covariance {I J : Type*} [Countable I] [Countable J]
+    (rho c : I -> Complex) (tau d : J -> Complex)
+    (hRe : forall i, (rho i).re=(1/2 : Real))
+    (hReTau : forall j, (tau j).re=(1/2 : Real))
+    (hC : Summable (fun i => norm (c i))) (hD : Summable (fun j => norm (d j)))
+    (k l m n : Nat) :
+    Tendsto (intervalMean (fun t : Real =>
+      (tsum (fun i => c i * ((((Nat.floor (Real.exp t) : Real)^m : Real) : Complex)^
+        ((rho i-1/2)/(k : Complex))))) *
+      star (tsum (fun j => d j * ((((Nat.floor (Real.exp t) : Real)^n : Real) : Complex)^
+        ((tau j-1/2)/(l : Complex))))))) atTop
+      (nhds (tsum (fun p : Prod I J =>
+        if (m : Real)*(rho p.1).im/(k : Real)=(n : Real)*(tau p.2).im/(l : Real)
+        then c p.1*star (d p.2) else 0))) := by
+  have h := tendsto_exponentialSeries_covarianceLogFloorMean
+    c (fun i => (m : Real)*(rho i).im/(k : Real))
+    d (fun j => (n : Real)*(tau j).im/(l : Real)) hC hD
+  apply h.congr'
+  filter_upwards [Filter.eventually_gt_atTop (0 : Real)] with T hT
+  unfold intervalMean
+  congr 1
+  apply intervalIntegral.integral_congr
+  intro t ht
+  have htI : Membership.mem (Set.Icc (0 : Real) T) t := by
+    simpa only [Set.uIcc_of_le hT.le] using ht
+  have hP : (0 : Real) < (Nat.floor (Real.exp t) : Real) := by
+    exact_mod_cast (Nat.floor_pos.mpr (Real.one_le_exp_iff.mpr htI.1))
+  dsimp only
+  rw [exponentialSeries_eq_criticalLinePowerSum rho c hRe k m hP,
+    exponentialSeries_eq_criticalLinePowerSum tau d hReTau l n hP]
+
+/-- Full bilinear perturbation bound for two separate approximations. -/
+theorem norm_mul_star_sub_le (z w u v : Complex) :
+    norm (z*star w-u*star v) <=
+      norm (z-u)*(norm (w-v)+norm v)+norm u*norm (w-v) := by
+  have hIdentity : z*star w-u*star v =
+      (z-u)*star (w-v)+(z-u)*star v+u*star (w-v) := by
+    simp only [star_sub]
+    ring
+  rw [hIdentity]
+  have h := (norm_add_le ((z-u)*star (w-v)+(z-u)*star v) (u*star (w-v))).trans
+    (add_le_add (norm_add_le ((z-u)*star (w-v)) ((z-u)*star v)) le_rfl)
+  simp only [norm_mul, norm_star] at h
+  exact h.trans_eq (by ring)
+
+/-- Two vanishing additive errors preserve the full conjugate product
+when both comparison families are eventually bounded. -/
+theorem tendsto_mul_star_sub_of_tendsto_sub {A : Type*} {f : Filter A}
+    (u v a b : A -> Complex) {C D : Real}
+    (hU : Tendsto (fun x => u x-a x) f (nhds (0 : Complex)))
+    (hV : Tendsto (fun x => v x-b x) f (nhds (0 : Complex)))
+    (hA : Filter.Eventually (fun x => norm (a x) <= C) f)
+    (hB : Filter.Eventually (fun x => norm (b x) <= D) f) :
+    Tendsto (fun x => u x*star (v x)-a x*star (b x)) f (nhds (0 : Complex)) := by
+  have hUNorm := hU.norm
+  have hVNorm := hV.norm
+  simp only [norm_zero] at hUNorm hVNorm
+  have hMajor : Tendsto (fun x => norm (u x-a x)*(norm (v x-b x)+D)+C*norm (v x-b x))
+      f (nhds (0 : Real)) := by
+    simpa only [zero_mul, mul_zero, add_zero] using
+      (hUNorm.mul (hVNorm.add_const D)).add (hVNorm.const_mul C)
+  apply tendsto_zero_iff_norm_tendsto_zero.mpr
+  apply squeeze_zero' (Filter.Eventually.of_forall (fun x => norm_nonneg _)) _ hMajor
+  filter_upwards [hA, hB] with x hAX hBX
+  apply (norm_mul_star_sub_le (u x) (v x) (a x) (b x)).trans
+  exact add_le_add
+    (mul_le_mul_of_nonneg_left (add_le_add le_rfl hBX) (norm_nonneg _))
+    (mul_le_mul_of_nonneg_right hAX (norm_nonneg _))
+
 /-- Full quadratic perturbation bound, retaining both cross terms. -/
 theorem norm_mul_star_self_sub_le (z w : Complex) :
     norm (z*star z-w*star w) <= norm (z-w)*(norm (z-w)+2*norm w) := by
@@ -208,6 +279,57 @@ theorem tendsto_mul_star_self_sub_of_tendsto_sub {A : Type*} {l : Filter A}
   apply (norm_mul_star_self_sub_le (u a) (v a)).trans
   apply mul_le_mul_of_nonneg_left _ (norm_nonneg _)
   linarith
+
+/-- Exact full mixed centering identity on logarithmic floor clocks. -/
+theorem intervalMean_nat_floor_exp_centered_product_eq
+    (u v : Nat -> Complex) (z w : Complex) {T : Real} (hT : Not (T=0)) :
+    intervalMean (fun t : Real =>
+      (u (Nat.floor (Real.exp t))-z)*star (v (Nat.floor (Real.exp t))-w)) T =
+      intervalMean (fun t : Real => u (Nat.floor (Real.exp t))*star (v (Nat.floor (Real.exp t)))) T -
+        intervalMean (fun t : Real => u (Nat.floor (Real.exp t))) T*star w -
+        z*star (intervalMean (fun t : Real => v (Nat.floor (Real.exp t))) T)+z*star w := by
+  have hPoint : (fun t : Real =>
+      (u (Nat.floor (Real.exp t))-z)*star (v (Nat.floor (Real.exp t))-w)) =
+      (fun t : Real => (u (Nat.floor (Real.exp t))*star (v (Nat.floor (Real.exp t))) -
+        u (Nat.floor (Real.exp t))*star w) - z*star (v (Nat.floor (Real.exp t)))+z*star w) := by
+    funext t
+    simp only [star_sub]
+    ring
+  have hRight : intervalMean (fun t : Real => u (Nat.floor (Real.exp t))*star w) T =
+      intervalMean (fun t : Real => u (Nat.floor (Real.exp t))) T*star w := by
+    unfold intervalMean
+    rw [intervalIntegral.integral_mul_const]
+    ring
+  have hLeft : intervalMean (fun t : Real => z*star (v (Nat.floor (Real.exp t)))) T =
+      z*star (intervalMean (fun t : Real => v (Nat.floor (Real.exp t))) T) := by
+    rw [<- intervalMean_star]
+    unfold intervalMean
+    rw [intervalIntegral.integral_const_mul]
+    ring
+  rw [hPoint,
+    intervalMean_nat_floor_exp_add (fun n => (u n*star (v n)-u n*star w)-z*star (v n)) (fun _ => z*star w),
+    intervalMean_nat_floor_exp_sub (fun n => u n*star (v n)-u n*star w) (fun n => z*star (v n)),
+    intervalMean_nat_floor_exp_sub (fun n => u n*star (v n)) (fun n => u n*star w),
+    hRight, hLeft, intervalMean_const (z*star w) hT]
+
+/-- Complete sampled means and conjugate-product limit give the exact
+centered covariance, retaining both cross terms and the finite prefix. -/
+theorem tendsto_intervalMean_nat_floor_exp_centered_product
+    (u v : Nat -> Complex) (z w s : Complex)
+    (hU : Tendsto (intervalMean (fun t : Real => u (Nat.floor (Real.exp t)))) atTop (nhds z))
+    (hV : Tendsto (intervalMean (fun t : Real => v (Nat.floor (Real.exp t)))) atTop (nhds w))
+    (hProduct : Tendsto (intervalMean (fun t : Real =>
+      u (Nat.floor (Real.exp t))*star (v (Nat.floor (Real.exp t))))) atTop (nhds s)) :
+    Tendsto (intervalMean (fun t : Real =>
+      (u (Nat.floor (Real.exp t))-z)*star (v (Nat.floor (Real.exp t))-w)))
+      atTop (nhds (s-z*star w)) := by
+  have h := ((hProduct.sub (hU.mul_const (star w))).sub
+    (hV.star.const_mul z)).add_const (z*star w)
+  have hConstant : s-z*star w-z*star w+z*star w=s-z*star w := by ring
+  rw [hConstant] at h
+  apply h.congr'
+  filter_upwards [Filter.eventually_gt_atTop (0 : Real)] with T hT
+  exact (intervalMean_nat_floor_exp_centered_product_eq u v z w hT.ne').symm
 
 /-- Complete mass of all pairs representing the same point. -/
 def pointCollisionMass {I X : Type*} (rho : I -> X) (c : X -> Complex) : Real := by
