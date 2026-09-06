@@ -58,6 +58,10 @@ equals Re(F'/F(n))/(n-1/2) for the actual symmetric completion under
 ERH, or xi under RH. The full leading amplitude is bounded by
 n*sqrt(Z*M_n), and the actual weighted arithmetic integrals inherit
 this refinement with every parity and trivial-zero correction retained.
+The actual root zero series has logarithmic mean 2k/(k-1/2) times the
+central multiplicity of its canonical zero family. The principal case
+has mean zero under RH, using proved nonvanishing of zeta at one half.
+No pointwise limit or absence of central Dirichlet zeros is asserted.
 No RH, ERH or GRH assertion is proved merely
 by these equivalences or conditional correction estimates.
 -/

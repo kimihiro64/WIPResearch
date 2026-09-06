@@ -7,6 +7,7 @@ import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
 import RobinBV.NumberField.Proof.RiemannShiftedZeroMass
+import RobinBV.NumberField.Proof.ZeroSeriesLogarithmicMean
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -21,4 +22,6 @@ Its complete canonical zero-series leading term includes every parity,
 conductor correction, central zero and multiplicity.
 Complete kernel errors retain the shifted spectral mass, evaluated by the
 actual completed-function logarithmic derivative under the stated RH/ERH.
+The actual root zero series has logarithmic mean 2k/(k-1/2) times its
+canonical central multiplicity. The principal xi central multiplicity is zero.
 -/
