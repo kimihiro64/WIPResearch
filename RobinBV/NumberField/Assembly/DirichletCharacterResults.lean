@@ -4,7 +4,7 @@ import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
-import RobinBV.NumberField.Proof.OrderSixCharacterPacket
+import RobinBV.NumberField.Proof.OrderSixPacketIntegrals
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -58,4 +58,9 @@ cancels the complete earlier tails of a finite weighted arithmetic packet.
 Its selected principal fiber gives the exact unconditional leading constant.
 The order6 packet 1-chi^2-chi^3+chi^5 cancels layers2,3,4 and has actual
 P^(4/5)logP normalized limit -5/4 at prefix index1, without RH or ERH.
+For chi^6=1, its pointwise real weights are exactly zero or three.
+Every powered packet remains nonnegative, including nonunit residues.
+The complete higher-power tail is integrable and gives an exact negative
+integral representation, hence a nonpositive real arithmetic prefix at
+every m>=1 and P^m>=3, without RH, ERH or omitted prime powers.
 -/
