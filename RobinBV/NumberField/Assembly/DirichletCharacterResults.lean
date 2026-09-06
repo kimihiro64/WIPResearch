@@ -2,9 +2,9 @@ import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.MovingCharacterBoundaryCovariance
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
-import RobinBV.NumberField.Proof.MovingCharacterPowerCancellation
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
+import RobinBV.NumberField.Proof.OrderSixCharacterPacket
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -53,4 +53,9 @@ The resulting sharper actual comparison is unconditional, with no strict
 selected-layer upper bound. A nonprincipal chi with chi^(m+1)=1 has positive
 next-layer comparison constant (m+2)/(m(m+1)) against principal; such fixed
 layers are cofinal for every nonprincipal character without GRH.
+More generally, zero coefficient on every earlier powered-character fiber
+cancels the complete earlier tails of a finite weighted arithmetic packet.
+Its selected principal fiber gives the exact unconditional leading constant.
+The order6 packet 1-chi^2-chi^3+chi^5 cancels layers2,3,4 and has actual
+P^(4/5)logP normalized limit -5/4 at prefix index1, without RH or ERH.
 -/
