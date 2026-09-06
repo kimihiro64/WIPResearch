@@ -2,6 +2,7 @@ import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.MovingCharacterBoundaryCovariance
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
+import RobinBV.NumberField.Proof.MovingCharacterPowerCancellation
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
 
@@ -47,4 +48,9 @@ complete conjugate-product mean is the canonical scaled-frequency pair sum
 divided by the two layer indices. Every cross-family coincidence is retained.
 Centering subtracts the product of the actual central-multiplicity means;
 no zero-family independence, disjointness or moving-layer limit is assumed.
+Equal earlier character powers cancel their complete root tails exactly.
+The resulting sharper actual comparison is unconditional, with no strict
+selected-layer upper bound. A nonprincipal chi with chi^(m+1)=1 has positive
+next-layer comparison constant (m+2)/(m(m+1)) against principal; such fixed
+layers are cofinal for every nonprincipal character without GRH.
 -/
