@@ -3,13 +3,11 @@ Copyright (c) 2026 Jonas Whidden. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+import Mathlib.Analysis.Normed.Group.FunctionSeries
 import Mathlib.Analysis.Normed.Group.Tannery
-import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
-import Mathlib.MeasureTheory.Integral.DominatedConvergence
-import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
+import RobinBV.Mathlib.Analysis.SpecificLimits.IntervalMean
 
 /-!
 # Cesaro means of absolutely convergent exponential series
@@ -92,11 +90,13 @@ theorem tendsto_exponentialMean (omega : Real) :
     filter_upwards [Filter.eventually_gt_atTop (0 : Real)] with T hT
     exact norm_exponentialMean_le_inv_mul hOmega hT
 
+/-- Complete exponential series with arbitrary real frequencies. -/
+def exponentialSeries {I : Type*} (c : I -> Complex) (omega : I -> Real) (t : Real) : Complex :=
+  tsum (fun i => c i*Complex.exp ((omega i : Complex)*Complex.I*(t : Complex)))
+
 /-- Actual integral mean of the complete exponential series. -/
 def exponentialSeriesMean {I : Type*} (c : I -> Complex) (omega : I -> Real) (T : Real) : Complex :=
-  Inv.inv (T : Complex) * intervalIntegral
-    (fun t : Real => tsum (fun i => c i * Complex.exp ((omega i : Complex)*Complex.I*(t : Complex))))
-    0 T volume
+  intervalMean (exponentialSeries c omega) T
 
 /-- Full mean and complete series interchange under absolute summability. -/
 theorem exponentialSeriesMean_eq_tsum {I : Type*} [Countable I]
@@ -122,7 +122,7 @@ theorem exponentialSeriesMean_eq_tsum {I : Type*} [Countable I]
     (fun i => Filter.Eventually.of_forall (fun t _ => (hNorm i t).le))
     (Filter.Eventually.of_forall (fun _t _ => hC)) intervalIntegrable_const
     (Filter.Eventually.of_forall (fun t _ => (hSum t).hasSum))
-  unfold exponentialSeriesMean
+  unfold exponentialSeriesMean intervalMean exponentialSeries
   rw [<- hIntegral.tsum_eq, <- tsum_mul_left]
   apply tsum_congr
   intro i
@@ -149,6 +149,121 @@ theorem tendsto_exponentialSeriesMean {I : Type*} [Countable I]
   have h := tendsto_tsum_of_dominated_convergence hC hPoint hBound
   apply h.congr'
   exact Filter.Eventually.of_forall (fun T => (exponentialSeriesMean_eq_tsum c omega hC T).symm)
+
+/-- Absolute summability makes the full exponential series continuous. -/
+theorem continuous_exponentialSeries {I : Type*} (c : I -> Complex) (omega : I -> Real)
+    (hC : Summable (fun i => norm (c i))) : Continuous (exponentialSeries c omega) := by
+  apply continuous_tsum (fun _i => by fun_prop) hC
+  intro i t
+  rw [norm_mul, Complex.norm_exp]
+  simp
+
+/-- A uniform full-series bound, independent of time and frequency gaps. -/
+theorem norm_exponentialSeries_le {I : Type*} (c : I -> Complex) (omega : I -> Real)
+    (hC : Summable (fun i => norm (c i))) (t : Real) :
+    norm (exponentialSeries c omega t) <= tsum (fun i => norm (c i)) := by
+  have hNorm (i : I) : norm (c i*Complex.exp ((omega i : Complex)*Complex.I*(t : Complex)))=norm (c i) := by
+    rw [norm_mul, Complex.norm_exp]
+    simp
+  have hAbs : Summable (fun i => norm (c i*Complex.exp ((omega i : Complex)*Complex.I*(t : Complex)))) :=
+    hC.congr (fun i => (hNorm i).symm)
+  exact (norm_tsum_le_tsum_norm hAbs).trans_eq (tsum_congr hNorm)
+
+private theorem phase_clock_error_tendsto (omega : Real) :
+    Tendsto (fun t : Real =>
+      Complex.exp ((omega : Complex)*Complex.I*(Real.log (Nat.floor (Real.exp t) : Real) : Complex)) -
+        Complex.exp ((omega : Complex)*Complex.I*(t : Complex))) atTop (nhds (0 : Complex)) := by
+  have hDelta := (Complex.continuous_ofReal.tendsto 0).comp tendsto_log_nat_floor_exp_sub_self
+  have hSmall : Tendsto (fun t : Real =>
+      Complex.exp ((omega : Complex)*Complex.I*((Real.log (Nat.floor (Real.exp t) : Real)-t : Real) : Complex))-1)
+      atTop (nhds (0 : Complex)) := by
+    have hArg : Tendsto (fun t : Real =>
+        (omega : Complex)*Complex.I*((Real.log (Nat.floor (Real.exp t) : Real)-t : Real) : Complex))
+        atTop (nhds (0 : Complex)) := by
+      simpa only [Function.comp_def, Complex.ofReal_zero, mul_zero] using
+        hDelta.const_mul ((omega : Complex)*Complex.I)
+    have h := ((Complex.continuous_exp.tendsto 0).comp hArg).sub_const 1
+    simpa only [Function.comp_def, Complex.ofReal_zero, mul_zero, Complex.exp_zero, sub_self] using h
+  apply tendsto_zero_iff_norm_tendsto_zero.mpr
+  have hNormSmall := hSmall.norm
+  simp only [norm_zero] at hNormSmall
+  apply hNormSmall.congr'
+  apply Filter.Eventually.of_forall
+  intro t
+  have hArg : (omega : Complex)*Complex.I*(Real.log (Nat.floor (Real.exp t) : Real) : Complex) =
+      (omega : Complex)*Complex.I*(t : Complex) +
+        (omega : Complex)*Complex.I*((Real.log (Nat.floor (Real.exp t) : Real)-t : Real) : Complex) := by
+    push_cast
+    ring
+  dsimp only
+  rw [hArg, Complex.exp_add]
+  have hFactor (a b : Complex) : a*b-a=a*(b-1) := by ring
+  rw [hFactor, norm_mul, Complex.norm_exp]
+  simp
+
+/-- Replacing exponential time by its logarithmic floor clock has a
+vanishing full-series error. No summable first frequency moment is needed. -/
+theorem exponentialSeries_logFloor_sub_tendsto_zero {I : Type*}
+    (c : I -> Complex) (omega : I -> Real) (hC : Summable (fun i => norm (c i))) :
+    Tendsto (fun t : Real => exponentialSeries c omega (Real.log (Nat.floor (Real.exp t) : Real)) -
+      exponentialSeries c omega t) atTop (nhds (0 : Complex)) := by
+  have hNorm (i : I) (t : Real) :
+      norm (c i*Complex.exp ((omega i : Complex)*Complex.I*(t : Complex)))=norm (c i) := by
+    rw [norm_mul, Complex.norm_exp]
+    simp
+  have hSeries (t : Real) : Summable (fun i => c i*Complex.exp ((omega i : Complex)*Complex.I*(t : Complex))) :=
+    hC.of_norm_bounded (fun i => (hNorm i t).le)
+  have hPoint (i : I) : Tendsto (fun t : Real =>
+      c i*Complex.exp ((omega i : Complex)*Complex.I*(Real.log (Nat.floor (Real.exp t) : Real) : Complex)) -
+        c i*Complex.exp ((omega i : Complex)*Complex.I*(t : Complex))) atTop (nhds (0 : Complex)) := by
+    simpa only [mul_sub, mul_zero] using (phase_clock_error_tendsto (omega i)).const_mul (c i)
+  have hBound : Filter.Eventually (fun t : Real => forall i,
+      norm (c i*Complex.exp ((omega i : Complex)*Complex.I*(Real.log (Nat.floor (Real.exp t) : Real) : Complex)) -
+        c i*Complex.exp ((omega i : Complex)*Complex.I*(t : Complex))) <= 2*norm (c i)) atTop := by
+    apply Filter.Eventually.of_forall
+    intro t i
+    exact (norm_sub_le _ _).trans_eq (by rw [hNorm, hNorm]; ring)
+  have h := tendsto_tsum_of_dominated_convergence (hC.mul_left 2) hPoint hBound
+  simp only [tsum_zero] at h
+  apply h.congr'
+  apply Filter.Eventually.of_forall
+  intro t
+  exact (hSeries (Real.log (Nat.floor (Real.exp t) : Real))).tsum_sub (hSeries t)
+
+/-- The complete spectral mean is preserved by logarithmic floor sampling.
+The proof controls the whole clock error before averaging it. -/
+theorem tendsto_exponentialSeries_logFloorMean {I : Type*} [Countable I]
+    (c : I -> Complex) (omega : I -> Real) (hC : Summable (fun i => norm (c i))) :
+    Tendsto (intervalMean (fun t : Real =>
+      exponentialSeries c omega (Real.log (Nat.floor (Real.exp t) : Real)))) atTop
+      (nhds (tsum (fun i => if omega i=0 then c i else 0))) := by
+  have hCont := continuous_exponentialSeries c omega hC
+  have hClock : Measurable (fun t : Real => Real.log (Nat.floor (Real.exp t) : Real)) :=
+    Real.measurable_log.comp ((measurable_of_countable (fun n : Nat => (n : Real))).comp
+      (Nat.measurable_floor.comp Real.measurable_exp))
+  have hMeas : StronglyMeasurable (fun t : Real =>
+      exponentialSeries c omega (Real.log (Nat.floor (Real.exp t) : Real)) -
+        exponentialSeries c omega t) :=
+    ((hCont.measurable.comp hClock).sub hCont.measurable).stronglyMeasurable
+  have hBound (t : Real) :
+      norm (exponentialSeries c omega (Real.log (Nat.floor (Real.exp t) : Real)) -
+        exponentialSeries c omega t) <= 2*tsum (fun i => norm (c i)) := by
+    exact (norm_sub_le _ _).trans ((add_le_add
+      (norm_exponentialSeries_le c omega hC _) (norm_exponentialSeries_le c omega hC t)).trans_eq (by ring))
+  have hError := tendsto_intervalMean_of_bounded_tendsto _ hMeas hBound
+    (exponentialSeries_logFloor_sub_tendsto_zero c omega hC)
+  have h := hError.add (tendsto_exponentialSeriesMean c omega hC)
+  simp only [zero_add] at h
+  apply h.congr'
+  apply Filter.Eventually.of_forall
+  intro T
+  have hFloorInt := intervalIntegrable_nat_floor_exp
+    (fun n : Nat => exponentialSeries c omega (Real.log (n : Real))) 0 T
+  have hContInt : IntervalIntegrable (exponentialSeries c omega) volume 0 T :=
+    hCont.intervalIntegrable 0 T
+  simp only [exponentialSeriesMean, intervalMean]
+  rw [intervalIntegral.integral_sub hFloorInt hContInt]
+  ring
 
 end
 

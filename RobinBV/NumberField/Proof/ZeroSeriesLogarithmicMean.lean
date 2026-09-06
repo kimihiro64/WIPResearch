@@ -130,7 +130,7 @@ private theorem criticalRootSeries_mean {I : Type*} (rho : I -> Complex)
   apply h.congr'
   apply Filter.Eventually.of_forall
   intro T
-  unfold Complex.exponentialSeriesMean
+  unfold Complex.exponentialSeriesMean Complex.intervalMean Complex.exponentialSeries
   congr 1
   apply intervalIntegral.integral_congr
   intro t _ht
@@ -138,6 +138,63 @@ private theorem criticalRootSeries_mean {I : Type*} (rho : I -> Complex)
   intro i
   dsimp only [c, omega]
   rw [rootPhase_exp_eq (hRe i)]
+
+private theorem criticalRootSeries_power_logFloor_mean {I : Type*} (rho : I -> Complex)
+    (hRe : forall i, (rho i).re=(1/2 : Real))
+    (hWeight : Summable (fun i => (Inv.inv (norm (rho i)))^2))
+    {k : Nat} (hk : 1 <= k) (m : Nat) (hm : 1 <= m) :
+    Tendsto (Complex.intervalMean (fun t : Real => tsum (fun i =>
+      (k : Complex)/(rho i*((k : Complex)-rho i))*
+        ((((Nat.floor (Real.exp t) : Real)^m : Real) : Complex)^((rho i-1/2)/(k : Complex))))))
+      atTop (nhds ((2*(k : Complex)/((k : Complex)-1/2))*
+        (Nat.card {i : I // rho i=(1/2 : Complex)} : Complex))) := by
+  let : Countable I := criticalFamily_countable rho hRe hWeight
+  let c : I -> Complex := fun i => (k : Complex)/(rho i*((k : Complex)-rho i))
+  let omega : I -> Real := fun i => (m : Real)*(rho i).im/(k : Real)
+  have hkR : (1 : Real) <= k := by exact_mod_cast hk
+  have hmR : Not ((m : Real)=0) := by exact_mod_cast (by omega : Not (m=0))
+  have hC : Summable (fun i => norm (c i)) := by
+    simpa only [c, Complex.ofReal_natCast] using
+      (Complex.summable_real_div_mul_sub_of_re_eq_half rho hRe hWeight hkR).norm
+  have h := Complex.tendsto_exponentialSeries_logFloorMean c omega hC
+  have hCenter : tsum (fun i => if omega i=0 then c i else 0) =
+      (2*(k : Complex)/((k : Complex)-1/2))*
+        (Nat.card {i : I // rho i=(1/2 : Complex)} : Complex) := by
+    simpa only [omega, c, mul_div_assoc, mul_eq_zero, hmR, false_or] using
+      centralCoefficientSum rho hRe hWeight hk
+  rw [hCenter] at h
+  apply h.congr'
+  filter_upwards [Filter.eventually_gt_atTop (0 : Real)] with T hT
+  unfold Complex.intervalMean
+  congr 1
+  apply intervalIntegral.integral_congr
+  intro t ht
+  have htI : Membership.mem (Set.Icc (0 : Real) T) t := by
+    simpa only [Set.uIcc_of_le hT.le] using ht
+  let P : Real := Nat.floor (Real.exp t)
+  have hP : 0 < P := by
+    dsimp only [P]
+    exact_mod_cast (Nat.floor_pos.mpr (Real.one_le_exp_iff.mpr htI.1))
+  have hPow := pow_pos hP m
+  unfold Complex.exponentialSeries
+  apply tsum_congr
+  intro i
+  have hPhase : (((P^m : Real) : Complex)^((rho i-1/2)/(k : Complex))) =
+      Complex.exp ((omega i : Complex)*Complex.I*(Real.log P : Complex)) := by
+    calc
+      _ = ((Real.exp (Real.log (P^m)) : Real) : Complex)^((rho i-1/2)/(k : Complex)) := by
+        rw [Real.exp_log hPow]
+      _ = Complex.exp ((((rho i).im/(k : Real) : Real) : Complex)*Complex.I*(Real.log (P^m) : Complex)) :=
+        rootPhase_exp_eq (hRe i) k (Real.log (P^m))
+      _ = _ := by
+        rw [Real.log_pow]
+        congr 1
+        dsimp only [omega]
+        push_cast
+        ring
+  change c i*Complex.exp ((omega i : Complex)*Complex.I*(Real.log P : Complex)) =
+    c i*((P^m : Real) : Complex)^((rho i-1/2)/(k : Complex))
+  rw [hPhase]
 
 /-- Actual central multiplicity of the canonical primitive zero family;
 principal characters use the actual xi divisor. -/
@@ -192,6 +249,32 @@ theorem rootCharacterZeroSeries_logMean_tendsto
       criticalRootSeries_mean (fun p : QuadraticLZeroIndex chi.primitiveCharacter => quadraticLZeroValue p)
         (quadraticLZeroValue_re_eq_half_of_dirichletERH hPrimitive chi.primitiveCharacter_isPrimitive hERHPrimitive)
         (summable_quadraticLZeroWeight hPrimitive chi.primitiveCharacter_isPrimitive) (by omega : 1 <= k)
+
+/-- Every positive power of the logarithmically sampled cutoff has the
+same actual root-series mean; all canonical central multiplicities remain. -/
+theorem rootCharacterZeroSeries_power_logFloorMean_tendsto
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N) (hERH : DirichletERH chi)
+    {k : Nat} (hk : 2 <= k) (m : Nat) (hm : 1 <= m) :
+    Tendsto (Complex.intervalMean (fun t : Real =>
+      rootCharacterZeroSeries chi k ((Nat.floor (Real.exp t) : Real)^m)))
+      atTop (nhds ((2*(k : Complex)/((k : Complex)-1/2))*
+        (rootCharacterCentralMultiplicity chi : Complex))) := by
+  by_cases hChi : chi=1
+  next =>
+    subst chi
+    have hRH := (dirichletERH_principal_iff_riemannHypothesis (N := N)).1 hERH
+    simpa only [rootCharacterZeroSeries, rootCharacterCentralMultiplicity, ite_true] using
+      criticalRootSeries_power_logFloor_mean riemannXiDivisorZeroValue
+        (Robin1984.riemannXiDivisorZeroValue_re_eq_half_of_riemannHypothesis hRH)
+        Robin1984.summable_robinXiZeroWeight (by omega : 1 <= k) m hm
+  next =>
+    let : NeZero chi.conductor := NeZero.mk chi.conductor_ne_zero
+    have hPrimitive := BombieriVinogradov.DirichletCharacter.primitiveCharacter_ne_one_of_ne_one chi hChi
+    have hERHPrimitive := (dirichletERH_iff_primitive chi hChi).1 hERH
+    simpa only [rootCharacterZeroSeries, rootCharacterCentralMultiplicity, if_neg hChi] using
+      criticalRootSeries_power_logFloor_mean (fun p : QuadraticLZeroIndex chi.primitiveCharacter => quadraticLZeroValue p)
+        (quadraticLZeroValue_re_eq_half_of_dirichletERH hPrimitive chi.primitiveCharacter_isPrimitive hERHPrimitive)
+        (summable_quadraticLZeroWeight hPrimitive chi.primitiveCharacter_isPrimitive) (by omega : 1 <= k) m hm
 
 end
 

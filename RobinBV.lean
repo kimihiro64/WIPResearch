@@ -62,6 +62,12 @@ The actual root zero series has logarithmic mean 2k/(k-1/2) times the
 central multiplicity of its canonical zero family. The principal case
 has mean zero under RH, using proved nonvanishing of zeta at one half.
 No pointwise limit or absence of central Dirichlet zeros is asserted.
+For the actual centered boundary residual, logarithmic sampling at the
+integer cutoff floor(exp t) gives mean 2(m+1)/(m(m+1/2)) times the
+central multiplicity of chi^(m+1), under ERH of m+1<=j<2(m+1).
+Every earlier exact moment and principal model remains. Both full
+spectral clock error and arithmetic mean error are proved negligible.
+This is not a prime-only or CA-event average.
 No RH, ERH or GRH assertion is proved merely
 by these equivalences or conditional correction estimates.
 -/

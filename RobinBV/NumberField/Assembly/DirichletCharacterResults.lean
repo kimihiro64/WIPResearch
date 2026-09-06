@@ -1,13 +1,12 @@
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.DirichletGRHCriterion
 import RobinBV.NumberField.Proof.DirichletShiftedZeroMass
-import RobinBV.NumberField.Proof.MovingCharacterBoundaryZeros
+import RobinBV.NumberField.Proof.MovingCharacterBoundaryMean
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
 import RobinBV.NumberField.Proof.RiemannShiftedZeroMass
-import RobinBV.NumberField.Proof.ZeroSeriesLogarithmicMean
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -24,4 +23,7 @@ Complete kernel errors retain the shifted spectral mass, evaluated by the
 actual completed-function logarithmic derivative under the stated RH/ERH.
 The actual root zero series has logarithmic mean 2k/(k-1/2) times its
 canonical central multiplicity. The principal xi central multiplicity is zero.
+After full floor-clock and arithmetic error transfer, the actual centered
+boundary residual has integer-cutoff logarithmic mean
+2(m+1)/(m(m+1/2)) times the central multiplicity of chi^(m+1).
 -/
