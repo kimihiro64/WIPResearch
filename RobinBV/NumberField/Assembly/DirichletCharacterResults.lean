@@ -4,6 +4,7 @@ import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
+import RobinBV.NumberField.Proof.MovingSquaredCharacterPacket
 import RobinBV.NumberField.Proof.OrderSixPacketIntegrals
 
 /-!
@@ -63,4 +64,8 @@ Every powered packet remains nonnegative, including nonunit residues.
 The complete higher-power tail is integrable and gives an exact negative
 integral representation, hence a nonpositive real arithmetic prefix at
 every m>=1 and P^m>=3, without RH, ERH or omitted prime powers.
+More generally, every finite complex character sum has a positive squared
+pair-character packet. Its actual arithmetic quadratic form is exactly
+a negative full integral of squared norms, hence real and nonpositive
+for every coefficient vector, without an assumed residue sign or RH/ERH.
 -/

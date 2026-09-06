@@ -3,8 +3,7 @@ import RobinBV.Mathlib.Analysis.Complex.ShiftedInverseSquare
 import RobinBV.Mathlib.Analysis.MellinTail
 import RobinBV.Mathlib.Analysis.SpecificLimits.IntervalMeanOscillation
 import RobinBV.Mathlib.MeasureTheory.Integral.TailSwap
-import RobinBV.Mathlib.NumberTheory.DirichletCharacter.FiniteEulerProduct
-import RobinBV.Mathlib.NumberTheory.DirichletCharacter.PrimePowerSquareRemainder
+import RobinBV.Mathlib.NumberTheory.DirichletCharacter
 import RobinBV.Mathlib.NumberTheory.NumberField.QuadraticZetaFactorization
 import RobinBV.Mathlib.NumberTheory.PrimeSieve.InclusionExclusion
 import RobinBV.Mathlib.NumberTheory.PrimeSieve.OwnerModuli
