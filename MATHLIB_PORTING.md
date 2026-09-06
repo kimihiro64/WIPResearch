@@ -40,6 +40,7 @@ Replace the scaffold row when the first real candidate module is created.
 
 | Project module | Proposed Mathlib path | Readiness | Upstream reference |
 | --- | --- | --- | --- |
+| `RobinBV.Mathlib.NumberTheory.MulChar.PowerPacket` | `Mathlib/NumberTheory/MulChar/PowerPacket.lean` | project-verified | Exact finite-unit character-power periodicity, cofinal residue recurrence and nonvanishing, and annihilation of every character functional from full-cycle zero fibers, over arbitrary commutative semirings |
 | `RobinBV.Mathlib.NumberTheory.MulChar.PositivePacket` | `Mathlib/NumberTheory/MulChar/PositivePacket.lean` | project-verified | Exact conjugate-pair expansion and real positivity of arbitrary finite complex character sums, all actual powers including zero and nonunits; positive value-power conversion explicit |
 | `RobinBV.Mathlib.NumberTheory.DirichletCharacter` | `Mathlib/NumberTheory/DirichletCharacter.lean` | project-verified | Narrow export facade for finite Euler products, complete prime-power decompositions and positive finite character packets |
 | `RobinBV.Mathlib.Analysis.SpecificLimits.IntervalMeanOscillation` | `Mathlib/Analysis/SpecificLimits/IntervalMeanOscillation.lean` | project-verified | Complete shifted second moments and quantitative two-sided excursions; asymptotically real complex sequences treated by full quadratic stability, with every finite prefix retained and explicit positive amplitude |

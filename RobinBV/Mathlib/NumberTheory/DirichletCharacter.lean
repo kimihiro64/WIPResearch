@@ -6,9 +6,11 @@ Authors: Jonas
 import RobinBV.Mathlib.NumberTheory.DirichletCharacter.FiniteEulerProduct
 import RobinBV.Mathlib.NumberTheory.DirichletCharacter.PrimePowerSquareRemainder
 import RobinBV.Mathlib.NumberTheory.MulChar.PositivePacket
+import RobinBV.Mathlib.NumberTheory.MulChar.PowerPacket
 
 /-!
 # Finite character products, prime-power decompositions and positive packets
 
-A narrow candidate export surface for the three related character branches.
+A narrow candidate export surface for character products, prime-power
+decompositions, positive packets and finite-unit power recurrence.
 -/

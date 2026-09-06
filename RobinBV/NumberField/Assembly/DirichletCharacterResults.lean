@@ -2,6 +2,7 @@ import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.MovingCharacterBoundaryCovariance
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
+import RobinBV.NumberField.Proof.MovingCharacterPacketObstruction
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
 import RobinBV.NumberField.Proof.MovingSquaredCharacterPacket
@@ -68,4 +69,9 @@ More generally, every finite complex character sum has a positive squared
 pair-character packet. Its actual arithmetic quadratic form is exactly
 a negative full integral of squared norms, hence real and nonpositive
 for every coefficient vector, without an assumed residue sign or RH/ERH.
+At fixed modulus every nonzero residue packet recurs cofinally in its
+actual character powers. Vanishing all power fibers through one complete
+higher unit-group cycle erases the entire arithmetic packet at every cutoff.
+Every nonzero actual correction therefore has an uncancelled fiber within
+that finite cycle. This does not exclude approximate or variable-modulus filters.
 -/
