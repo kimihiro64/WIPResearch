@@ -1,10 +1,9 @@
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
-import RobinBV.NumberField.Proof.DirichletGRHCriterion
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
-import RobinBV.NumberField.Proof.PrincipalBoundarySharpness
+import RobinBV.NumberField.Proof.ResonantBoundaryUniversality
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -35,4 +34,8 @@ For every principal character and every m>=1, RH implies strictly positive
 actual second moment and arbitrarily late norm excursions at every smaller
 squared amplitude. Thus the normalized principal residual does not tend to
 zero; no assertion of both signs is included in this magnitude result.
+At every resonant layer chi^(m+1)=1, the complete profile differs from
+the principal profile by a vanishing quantity, even for nonreal characters.
+Full Dirichlet GRH supplies cofinal fixed sharp layers for every character.
+Balanced finite resonant combinations cancel the entire leading fluctuation.
 -/
