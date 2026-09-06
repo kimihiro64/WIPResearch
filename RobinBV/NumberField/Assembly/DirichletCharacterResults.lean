@@ -1,10 +1,10 @@
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.DirichletGRHCriterion
-import RobinBV.NumberField.Proof.MovingCharacterBoundarySecondMoment
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
+import RobinBV.NumberField.Proof.PrincipalBoundarySharpness
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -31,4 +31,8 @@ The diagonal mass is evaluated by actual completed logarithmic derivatives
 at zero and at the selected root index. The complete nonnegative repeated-zero
 correction remains explicit. Subtracting the exact canonical central mean
 gives the actual centered variance and its nonnegative real part.
+For every principal character and every m>=1, RH implies strictly positive
+actual second moment and arbitrarily late norm excursions at every smaller
+squared amplitude. Thus the normalized principal residual does not tend to
+zero; no assertion of both signs is included in this magnitude result.
 -/

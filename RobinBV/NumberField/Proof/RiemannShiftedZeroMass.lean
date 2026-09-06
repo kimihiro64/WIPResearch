@@ -1,4 +1,6 @@
+import Mathlib.Analysis.Real.Pi.Bounds
 import Robin1984.Equivalence.RobinLemmaTwo
+import Robin1984.Finite.RobinFiniteStartupCATangentEndpoints
 import RobinBV.NumberField.Helpers.ZeroKernelShiftedMass
 
 /-!
@@ -158,6 +160,32 @@ theorem riemannWeightedIntegral_refined_bound
   change norm (F*J) <= _
   rw [hSplit]
   exact (norm_sub_le _ _).trans ((add_le_add hScaled hKernel).trans_eq (by ring))
+
+/-- The actual xi inverse-square mass is strictly positive under RH.
+Use the reviewed Robin1984 Euler-constant bound and a complete Taylor
+lower bound, not a numerically guessed zero. -/
+theorem riemann_inverseSquareZeroMass_pos (hRH : RiemannHypothesis) :
+    0 < tsum (fun p : RiemannXiDivisorZeroIndex =>
+      (Inv.inv (norm (riemannXiDivisorZeroValue p)))^2) := by
+  have hExp : (63 : Real)/5 < Real.exp ((322 : Real)/125) := by
+    refine lt_of_lt_of_le ?_
+      (Real.sum_le_exp_of_nonneg (by norm_num : (0 : Real) <= 322/125) 8)
+    norm_num [Finset.sum_range_succ, Nat.factorial_succ]
+  have hPi : 4*Real.pi < (63 : Real)/5 := by
+    nlinarith [Real.pi_lt_d2]
+  have hLog : Real.log (4*Real.pi) < (322 : Real)/125 :=
+    (Real.log_lt_iff_lt_exp (mul_pos (by norm_num : (0 : Real)<4) Real.pi_pos)).mpr (hPi.trans hExp)
+  rw [Robin1984.robinXiZeroConstant_eq_of_riemannHypothesis hRH]
+  linarith [Robin1984.seventy_two_div_125_lt_eulerMascheroniConstant]
+
+/-- Positivity of the actual mass proves a canonical xi zero exists under RH. -/
+theorem nonempty_riemannXiDivisorZeroIndex_of_riemannHypothesis (hRH : RiemannHypothesis) :
+    Nonempty RiemannXiDivisorZeroIndex := by
+  by_contra hEmpty
+  let : IsEmpty RiemannXiDivisorZeroIndex :=
+    IsEmpty.mk (fun p => hEmpty (Nonempty.intro p))
+  have hMass := riemann_inverseSquareZeroMass_pos hRH
+  simp at hMass
 
 end
 

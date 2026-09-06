@@ -214,6 +214,45 @@ theorem tsum_norm_real_div_mul_sub_sq_eq_of_re_eq_half
   simp only [norm_real_div_mul_sub_sq_eq_of_re_eq_half ha (hRe _)]
   rw [tsum_mul_left, hZ.tsum_sub hShift]
 
+/-- The complete squared two-pole coefficient family is summable. -/
+theorem summable_norm_real_div_mul_sub_sq_of_re_eq_half
+    {I : Type*} (rho : I -> Complex) (hRe : forall i, (rho i).re=1/2)
+    (hZ : Summable (fun i => (Inv.inv (norm (rho i)))^2))
+    {a : Real} (ha : 1 < a) :
+    Summable (fun i => norm ((a : Complex)/(rho i*((a : Complex)-rho i)))^2) := by
+  have hShift := summable_inv_norm_real_sub_sq_of_re_eq_half rho hRe hZ ha.le
+  apply ((hZ.sub hShift).mul_left (a/(a-1))).congr
+  intro i
+  exact (norm_real_div_mul_sub_sq_eq_of_re_eq_half ha (hRe i)).symm
+
+/-- A nonempty critical-line family has a strictly positive complete
+diagonal mass. The witness is symbolic, not a numerically selected point. -/
+theorem tsum_norm_real_div_mul_sub_sq_pos_of_re_eq_half
+    {I : Type*} [Nonempty I] (rho : I -> Complex) (hRe : forall i, (rho i).re=1/2)
+    (hZ : Summable (fun i => (Inv.inv (norm (rho i)))^2))
+    {a : Real} (ha : 1 < a) :
+    0 < tsum (fun i => norm ((a : Complex)/(rho i*((a : Complex)-rho i)))^2) := by
+  classical
+  let i : I := Classical.choice (inferInstance : Nonempty I)
+  have hRho : Not (rho i=0) := by
+    intro h
+    have hi := hRe i
+    simp [h] at hi
+  have hShift : Not ((a : Complex)-rho i=0) := by
+    intro h
+    have hr := congrArg Complex.re h
+    simp only [Complex.sub_re, Complex.ofReal_re, Complex.zero_re, hRe i] at hr
+    linarith
+  have hA : Not ((a : Complex)=0) :=
+    Complex.ofReal_ne_zero.mpr (by linarith : Not (a=0))
+  have hPos : 0 < norm ((a : Complex)/(rho i*((a : Complex)-rho i)))^2 :=
+    sq_pos_of_pos (norm_pos_iff.mpr (div_ne_zero hA (mul_ne_zero hRho hShift)))
+  have hSum := summable_norm_real_div_mul_sub_sq_of_re_eq_half rho hRe hZ ha
+  have hLe := hSum.sum_le_tsum ({i} : Finset I) (fun j _ => sq_nonneg
+    (norm ((a : Complex)/(rho j*((a : Complex)-rho j)))))
+  simp only [Finset.sum_singleton] at hLe
+  exact hPos.trans_le hLe
+
 end
 
 end Complex

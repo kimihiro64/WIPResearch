@@ -221,6 +221,70 @@ theorem re_nonneg_of_tendsto_intervalMean_mul_star_self (f : Real -> Complex) {s
   filter_upwards [Filter.eventually_ge_atTop (0 : Real)] with T hT
   exact intervalMean_mul_star_self_re_nonneg f hT
 
+/-- A uniform norm bound passes to every positive-length interval mean.
+The proof is the complete integral triangle bound divided by its length. -/
+theorem norm_intervalMean_le (f : Real -> Complex) {C : Real}
+    (hBound : forall t, norm (f t) <= C) {T : Real} (hT : 0 < T) :
+    norm (intervalMean f T) <= C := by
+  have hIntegral := intervalIntegral.norm_integral_le_of_norm_le_const
+    (a := (0 : Real)) (b := T) (C := C) (fun t _ => hBound t)
+  unfold intervalMean
+  rw [norm_mul, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hT]
+  apply (mul_le_mul_of_nonneg_left hIntegral (inv_pos.mpr hT).le).trans_eq
+  simp [abs_of_pos hT, hT.ne', mul_comm]
+
+/-- An eventual norm bound controls the limit of actual sampled means.
+Clipping removes the entire finite prefix; its full mean error tends to zero. -/
+theorem norm_le_of_tendsto_intervalMean_nat_floor_exp_of_eventually_norm_le
+    (u : Nat -> Complex) {s : Complex} {C : Real} (hC : 0 <= C)
+    (hMean : Tendsto (intervalMean (fun t : Real => u (Nat.floor (Real.exp t)))) atTop (nhds s))
+    (hBound : Filter.Eventually (fun n => norm (u n) <= C) atTop) :
+    norm s <= C := by
+  classical
+  let v : Nat -> Complex := fun n => if norm (u n) <= C then u n else 0
+  have hV (n : Nat) : norm (v n) <= C := by
+    dsimp only [v]
+    split_ifs with hn
+    next => exact hn
+    next => simpa only [norm_zero] using hC
+  have hError : Tendsto (fun n => u n-v n) atTop (nhds (0 : Complex)) := by
+    apply tendsto_const_nhds.congr'
+    filter_upwards [hBound] with n hn
+    simp only [v, if_pos hn, sub_self]
+  have hErrorMean := tendsto_intervalMean_nat_floor_exp (fun n => u n-v n) hError
+  have hVMean : Tendsto (intervalMean (fun t : Real => v (Nat.floor (Real.exp t)))) atTop (nhds s) := by
+    have h := hMean.sub hErrorMean
+    simp only [sub_zero] at h
+    apply h.congr'
+    apply Filter.Eventually.of_forall
+    intro T
+    dsimp only
+    rw [intervalMean_nat_floor_exp_sub u v]
+    ring
+  apply le_of_tendsto hVMean.norm
+  filter_upwards [Filter.eventually_gt_atTop (0 : Real)] with T hT
+  exact norm_intervalMean_le (fun t : Real => v (Nat.floor (Real.exp t)))
+    (fun t => hV (Nat.floor (Real.exp t))) hT
+
+/-- A positive complete second-moment limit forces arbitrarily late norm
+excursions at every smaller squared amplitude. No rate or gap is assumed. -/
+theorem frequently_norm_gt_of_secondMoment_limit
+    (u : Nat -> Complex) {s : Complex} (d : Real) (hd : 0 <= d)
+    (hMean : Tendsto (intervalMean (fun t : Real =>
+      u (Nat.floor (Real.exp t))*star (u (Nat.floor (Real.exp t))))) atTop (nhds s))
+    (hSmall : d^2 < norm s) :
+    Filter.Frequently (fun n : Nat => d < norm (u n)) atTop := by
+  by_contra hNot
+  have hBound : Filter.Eventually (fun n => norm (u n) <= d) atTop := by
+    simpa only [not_lt] using Filter.not_frequently.mp hNot
+  have hSquare : Filter.Eventually (fun n => norm (u n*star (u n)) <= d^2) atTop := by
+    filter_upwards [hBound] with n hn
+    rw [norm_mul, norm_star, pow_two]
+    exact mul_le_mul hn hn (norm_nonneg _) hd
+  have hLe := norm_le_of_tendsto_intervalMean_nat_floor_exp_of_eventually_norm_le
+    (fun n => u n*star (u n)) (sq_nonneg d) hMean hSquare
+  exact (not_le_of_gt hSmall) hLe
+
 end
 
 end Complex
