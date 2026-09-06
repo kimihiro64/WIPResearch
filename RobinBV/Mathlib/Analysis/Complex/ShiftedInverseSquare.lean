@@ -23,6 +23,18 @@ namespace Complex
 
 noncomputable section
 
+/-- A family of nonzero points with summable inverse-square weights is countable. -/
+theorem countable_of_summable_inv_norm_sq {I : Type*} (rho : I -> Complex)
+    (hRho : forall i, Not (rho i=0))
+    (hWeight : Summable (fun i => (Inv.inv (norm (rho i)))^2)) : Countable I := by
+  have hSupport : Function.support (fun i => (Inv.inv (norm (rho i)))^2) = Set.univ := by
+    apply Set.eq_univ_of_forall
+    intro i
+    simp [Function.mem_support, hRho i]
+  have h := hWeight.countable_support
+  rw [hSupport] at h
+  exact Set.countable_univ_iff.mp h
+
 /-- Moving a real center past one increases distance to the critical line. -/
 theorem norm_le_norm_real_sub_of_re_eq_half {z : Complex} {a : Real} (ha : 1 <= a) (hz : z.re = 1 / 2) :
     norm z <= norm ((a : Complex) - z) := by

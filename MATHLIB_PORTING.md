@@ -40,6 +40,7 @@ Replace the scaffold row when the first real candidate module is created.
 
 | Project module | Proposed Mathlib path | Readiness | Upstream reference |
 | --- | --- | --- | --- |
+| `RobinBV.Mathlib.Analysis.Fourier.ExponentialCovariance` | `Mathlib/Analysis/Fourier/ExponentialCovariance.lean` | project-verified | Complete conjugate-product series and continuous/log-floor covariance with every frequency collision; critical-line power-clock second moments and full quadratic perturbation stability, with no simplicity or independence assumption |
 | `RobinBV.Mathlib.Analysis.SpecificLimits.IntervalMean` | `Mathlib/Analysis/SpecificLimits/IntervalMean.lean` | project-verified | Continuous Cesaro preservation for bounded measurable convergent complex functions; exact rescaling, logarithmic floor sampling of convergent sequences, vanishing clock displacement, and arbitrary sampled-sequence local integrability |
 | `RobinBV.Mathlib.Analysis.Fourier.ExponentialMean` | `Mathlib/Analysis/Fourier/ExponentialMean.lean` | project-verified | Actual continuous Cesaro means of absolutely convergent complex exponential series; full integral/sum interchange, exact zero-frequency limit and logarithmic floor-clock stability, with no frequency gap, independence or first frequency-moment assumption |
 | `RobinBV.Mathlib.Analysis.Complex.ShiftedInverseSquare` | `Mathlib/Analysis/Complex/ShiftedInverseSquare.lean` | project-verified | Full critical-line shifted inverse-square mass comparison and exact real two-pole series identity for all real centers at least one; complete-series Cauchy-Schwarz refinement, including central points and arbitrary summable families |
@@ -77,6 +78,14 @@ Readiness should be one of: `extracting`, `project-verified`, `mathlib-ready`,
 `submitted`, or `upstreamed`. A module is `mathlib-ready` only after it has an
 identified destination, no project dependency, focused tests, and a clean
 standalone build against the project's pinned Mathlib revision.
+
+The covariance extension is recorded in the candidate table above.
+It proves the complete conjugate-product expansion, continuous and logarithmic
+floor covariance limits with all frequency collisions, exact critical-line
+power-clock second moments, and quadratic perturbation stability. No frequency
+gap, linear independence or simplicity assumption is used. The shifted
+inverse-square candidate also supplies countability from positive summable
+weights for arbitrary nonzero complex point families.
 
 ## Least-prime owner source provenance
 

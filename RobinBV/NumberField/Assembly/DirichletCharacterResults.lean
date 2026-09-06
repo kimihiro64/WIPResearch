@@ -1,7 +1,7 @@
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.DirichletGRHCriterion
 import RobinBV.NumberField.Proof.DirichletShiftedZeroMass
-import RobinBV.NumberField.Proof.MovingCharacterBoundaryMean
+import RobinBV.NumberField.Proof.MovingCharacterBoundarySecondMoment
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
@@ -26,4 +26,7 @@ canonical central multiplicity. The principal xi central multiplicity is zero.
 After full floor-clock and arithmetic error transfer, the actual centered
 boundary residual has integer-cutoff logarithmic mean
 2(m+1)/(m(m+1/2)) times the central multiplicity of chi^(m+1).
+Its exact second moment is the complete canonical equal-zero pair mass
+divided by m squared. All coincident-zero cross terms are retained;
+the full-series bound and squared arithmetic-error transfer are derived.
 -/
