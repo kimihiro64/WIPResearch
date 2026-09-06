@@ -9,6 +9,7 @@ import Mathlib.MeasureTheory.Function.Floor
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
 
 /-!
 # Interval means and logarithmic sampling of convergent sequences
@@ -123,6 +124,102 @@ theorem intervalMean_nat_floor_exp_sub (u v : Nat -> Complex) (T : Real) :
   unfold intervalMean
   rw [intervalIntegral.integral_sub (intervalIntegrable_nat_floor_exp u 0 T)
     (intervalIntegrable_nat_floor_exp v 0 T), mul_sub]
+
+/-- Complex conjugation commutes with the actual interval mean. -/
+theorem intervalMean_star (f : Real -> Complex) (T : Real) :
+    intervalMean (fun t => star (f t)) T = star (intervalMean f T) := by
+  have hInt : intervalIntegral (fun t => star (f t)) 0 T volume =
+      star (intervalIntegral f 0 T volume) :=
+    Complex.conjLIE.toLinearIsometry.intervalIntegral_comp_comm f
+  unfold intervalMean
+  rw [hInt]
+  simp
+
+/-- The mean of a constant is exact at every nonzero averaging length. -/
+theorem intervalMean_const (z : Complex) {T : Real} (hT : Not (T=0)) :
+    intervalMean (fun _ => z) T = z := by
+  have hTC := Complex.ofReal_ne_zero.mpr hT
+  simp [intervalMean, intervalIntegral.integral_const, Complex.real_smul, hTC]
+
+/-- Exact addition of arbitrary logarithmically sampled sequence means. -/
+theorem intervalMean_nat_floor_exp_add (u v : Nat -> Complex) (T : Real) :
+    intervalMean (fun t : Real => u (Nat.floor (Real.exp t))+v (Nat.floor (Real.exp t))) T =
+      intervalMean (fun t : Real => u (Nat.floor (Real.exp t))) T +
+        intervalMean (fun t : Real => v (Nat.floor (Real.exp t))) T := by
+  unfold intervalMean
+  rw [intervalIntegral.integral_add (intervalIntegrable_nat_floor_exp u 0 T)
+    (intervalIntegrable_nat_floor_exp v 0 T), mul_add]
+
+/-- Exact centering of the second moment for an arbitrary sampled sequence.
+All required local integrability is derived from the finite sampled range. -/
+theorem intervalMean_nat_floor_exp_centered_square_eq
+    (u : Nat -> Complex) (z : Complex) {T : Real} (hT : Not (T=0)) :
+    intervalMean (fun t : Real =>
+      (u (Nat.floor (Real.exp t))-z)*star (u (Nat.floor (Real.exp t))-z)) T =
+      intervalMean (fun t : Real => u (Nat.floor (Real.exp t))*star (u (Nat.floor (Real.exp t)))) T -
+        intervalMean (fun t : Real => u (Nat.floor (Real.exp t))) T * star z -
+        z * star (intervalMean (fun t : Real => u (Nat.floor (Real.exp t))) T) + z*star z := by
+  have hPoint : (fun t : Real =>
+      (u (Nat.floor (Real.exp t))-z)*star (u (Nat.floor (Real.exp t))-z)) =
+      (fun t : Real => (u (Nat.floor (Real.exp t))*star (u (Nat.floor (Real.exp t))) -
+        u (Nat.floor (Real.exp t))*star z) - z*star (u (Nat.floor (Real.exp t))) + z*star z) := by
+    funext t
+    simp only [star_sub]
+    ring
+  have hRight : intervalMean (fun t : Real => u (Nat.floor (Real.exp t))*star z) T =
+      intervalMean (fun t : Real => u (Nat.floor (Real.exp t))) T * star z := by
+    unfold intervalMean
+    rw [intervalIntegral.integral_mul_const]
+    ring
+  have hLeft : intervalMean (fun t : Real => z*star (u (Nat.floor (Real.exp t)))) T =
+      z*star (intervalMean (fun t : Real => u (Nat.floor (Real.exp t))) T) := by
+    rw [<- intervalMean_star]
+    unfold intervalMean
+    rw [intervalIntegral.integral_const_mul]
+    ring
+  rw [hPoint,
+    intervalMean_nat_floor_exp_add
+      (fun n => (u n*star (u n)-u n*star z)-z*star (u n)) (fun _ => z*star z),
+    intervalMean_nat_floor_exp_sub
+      (fun n => u n*star (u n)-u n*star z) (fun n => z*star (u n)),
+    intervalMean_nat_floor_exp_sub (fun n => u n*star (u n)) (fun n => u n*star z),
+    hRight, hLeft, intervalMean_const (z*star z) hT]
+
+/-- Actual mean and second-moment limits give the exact centered variance. -/
+theorem tendsto_intervalMean_nat_floor_exp_variance
+    (u : Nat -> Complex) (z s : Complex)
+    (hMean : Tendsto (intervalMean (fun t : Real => u (Nat.floor (Real.exp t)))) atTop (nhds z))
+    (hSecond : Tendsto (intervalMean (fun t : Real =>
+      u (Nat.floor (Real.exp t))*star (u (Nat.floor (Real.exp t))))) atTop (nhds s)) :
+    Tendsto (intervalMean (fun t : Real =>
+      (u (Nat.floor (Real.exp t))-z)*star (u (Nat.floor (Real.exp t))-z)))
+      atTop (nhds (s-z*star z)) := by
+  have h := ((hSecond.sub (hMean.mul_const (star z))).sub
+    (hMean.star.const_mul z)).add_const (z*star z)
+  have hConstant : s-z*star z-z*star z+z*star z=s-z*star z := by ring
+  rw [hConstant] at h
+  apply h.congr'
+  filter_upwards [Filter.eventually_gt_atTop (0 : Real)] with T hT
+  exact (intervalMean_nat_floor_exp_centered_square_eq u z hT.ne').symm
+
+/-- The actual squared-norm mean has nonnegative real part. -/
+theorem intervalMean_mul_star_self_re_nonneg (f : Real -> Complex)
+    {T : Real} (hT : 0 <= T) :
+    0 <= (intervalMean (fun t => f t*star (f t)) T).re := by
+  unfold intervalMean
+  simp only [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq,
+    intervalIntegral.integral_ofReal]
+  rw [<- Complex.ofReal_inv, <- Complex.ofReal_mul, Complex.ofReal_re]
+  exact mul_nonneg (inv_nonneg.mpr hT)
+    (intervalIntegral.integral_nonneg_of_forall hT (fun t => sq_nonneg (norm (f t))))
+
+/-- Any actual squared-norm interval-mean limit has nonnegative real part. -/
+theorem re_nonneg_of_tendsto_intervalMean_mul_star_self (f : Real -> Complex) {s : Complex}
+    (h : Tendsto (intervalMean (fun t => f t*star (f t))) atTop (nhds s)) :
+    0 <= s.re := by
+  apply ge_of_tendsto ((Complex.continuous_re.tendsto s).comp h)
+  filter_upwards [Filter.eventually_ge_atTop (0 : Real)] with T hT
+  exact intervalMean_mul_star_self_re_nonneg f hT
 
 end
 

@@ -1,12 +1,10 @@
 import RobinBV.NumberField.Proof.CharacterChebyshevDecay
 import RobinBV.NumberField.Proof.DirichletGRHCriterion
-import RobinBV.NumberField.Proof.DirichletShiftedZeroMass
 import RobinBV.NumberField.Proof.MovingCharacterBoundarySecondMoment
 import RobinBV.NumberField.Proof.MovingCharacterCenteredHierarchy
 import RobinBV.NumberField.Proof.MovingCharacterHigherResonance
 import RobinBV.NumberField.Proof.MovingCharacterQuartic
 import RobinBV.NumberField.Proof.MovingCharacterRealCutoff
-import RobinBV.NumberField.Proof.RiemannShiftedZeroMass
 
 /-!
 # Dirichlet critical criteria and sharp moving-level corrections
@@ -29,4 +27,8 @@ boundary residual has integer-cutoff logarithmic mean
 Its exact second moment is the complete canonical equal-zero pair mass
 divided by m squared. All coincident-zero cross terms are retained;
 the full-series bound and squared arithmetic-error transfer are derived.
+The diagonal mass is evaluated by actual completed logarithmic derivatives
+at zero and at the selected root index. The complete nonnegative repeated-zero
+correction remains explicit. Subtracting the exact canonical central mean
+gives the actual centered variance and its nonnegative real part.
 -/

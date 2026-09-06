@@ -1,5 +1,5 @@
 import RobinBV.NumberField.Proof.MovingCharacterBoundaryMean
-import RobinBV.NumberField.Proof.ZeroSeriesSecondMoment
+import RobinBV.NumberField.Proof.ZeroSeriesMomentMass
 
 /-!
 # Exact second moment of the actual arithmetic boundary residual
@@ -103,6 +103,63 @@ theorem centeredCharacter_boundary_secondMoment_tendsto
     (fun P : Nat => centeredCharacterBoundaryResidual chi m P * star (centeredCharacterBoundaryResidual chi m P))
     (fun P : Nat => boundaryCharacterZeroSeries chi m P * star (boundaryCharacterZeroSeries chi m P))]
   ring
+
+/-- Exact canonical central contribution to the arithmetic boundary mean. -/
+def boundaryCharacterCentralMean {N : Nat} [NeZero N]
+    (chi : DirichletCharacter Complex N) (m : Nat) : Complex :=
+  (2*((m+1 : Nat) : Complex)/((m : Complex)*(((m+1 : Nat) : Complex)-1/2))) *
+    (rootCharacterCentralMultiplicity (chi^(m+1)) : Complex)
+
+/-- Actual logarithmic variance after removing precisely the canonical
+central mean, including any central-zero multiplicity. -/
+theorem centeredCharacter_boundary_variance_tendsto
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N) (m : Nat) (hm : 1 <= m)
+    (hPowersERH : forall j : Nat, m+1 <= j -> j < 2*(m+1) -> DirichletERH (chi^j)) :
+    Tendsto (Complex.intervalMean (fun t : Real =>
+      (centeredCharacterBoundaryResidual chi m (Nat.floor (Real.exp t))-boundaryCharacterCentralMean chi m) *
+        star (centeredCharacterBoundaryResidual chi m (Nat.floor (Real.exp t))-boundaryCharacterCentralMean chi m)))
+      atTop (nhds (rootCharacterZeroSecondMoment (chi^(m+1)) (m+1)/(m : Complex)^2 -
+        boundaryCharacterCentralMean chi m * star (boundaryCharacterCentralMean chi m))) := by
+  have hMean : Tendsto (Complex.intervalMean (fun t : Real =>
+      centeredCharacterBoundaryResidual chi m (Nat.floor (Real.exp t)))) atTop
+      (nhds (boundaryCharacterCentralMean chi m)) :=
+    centeredCharacter_boundary_logMean_tendsto chi m hm hPowersERH
+  exact Complex.tendsto_intervalMean_nat_floor_exp_variance
+    (centeredCharacterBoundaryResidual chi m) (boundaryCharacterCentralMean chi m)
+    (rootCharacterZeroSecondMoment (chi^(m+1)) (m+1)/(m : Complex)^2) hMean
+    (centeredCharacter_boundary_secondMoment_tendsto chi m hm hPowersERH)
+
+/-- Fully evaluated actual variance: completed logarithmic derivatives,
+the full repeated-zero mass, and the squared central contribution. -/
+theorem centeredCharacter_boundary_variance_logDeriv_tendsto
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N) (m : Nat) (hm : 1 <= m)
+    (hPowersERH : forall j : Nat, m+1 <= j -> j < 2*(m+1) -> DirichletERH (chi^j)) :
+    Tendsto (Complex.intervalMean (fun t : Real =>
+      (centeredCharacterBoundaryResidual chi m (Nat.floor (Real.exp t))-boundaryCharacterCentralMean chi m) *
+        star (centeredCharacterBoundaryResidual chi m (Nat.floor (Real.exp t))-boundaryCharacterCentralMean chi m)))
+      atTop (nhds (
+        ((((m+1 : Nat) : Real)/(((m+1 : Nat) : Real)-1) *
+          (-2*(rootCharacterCompletedLogDeriv (chi^(m+1)) 0).re -
+            (rootCharacterCompletedLogDeriv (chi^(m+1)) ((m+1 : Nat) : Complex)).re /
+              (((m+1 : Nat) : Real)-1/2)) +
+          rootCharacterZeroRepeatMass (chi^(m+1)) (m+1) : Real) : Complex)/(m : Complex)^2 -
+        boundaryCharacterCentralMean chi m * star (boundaryCharacterCentralMean chi m))) := by
+  have h := centeredCharacter_boundary_variance_tendsto chi m hm hPowersERH
+  rw [rootCharacterZeroSecondMoment_eq_logDeriv_add_repeat (chi^(m+1))
+    (hPowersERH (m+1) le_rfl (by omega)) (by omega : 2 <= m+1)] at h
+  exact h
+
+/-- The actual centered variance constant is nonnegative; no sign of the
+uncentered arithmetic residual is asserted. -/
+theorem centeredCharacter_boundary_variance_re_nonneg
+    {N : Nat} [NeZero N] (chi : DirichletCharacter Complex N) (m : Nat) (hm : 1 <= m)
+    (hPowersERH : forall j : Nat, m+1 <= j -> j < 2*(m+1) -> DirichletERH (chi^j)) :
+    0 <= (rootCharacterZeroSecondMoment (chi^(m+1)) (m+1)/(m : Complex)^2 -
+      boundaryCharacterCentralMean chi m * star (boundaryCharacterCentralMean chi m)).re := by
+  exact Complex.re_nonneg_of_tendsto_intervalMean_mul_star_self
+    (fun t : Real => centeredCharacterBoundaryResidual chi m (Nat.floor (Real.exp t)) -
+      boundaryCharacterCentralMean chi m)
+    (centeredCharacter_boundary_variance_tendsto chi m hm hPowersERH)
 
 end
 

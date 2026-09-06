@@ -16,6 +16,7 @@ Neither distinctness nor linear independence of the frequencies is assumed.
 namespace Complex
 
 open Filter
+open scoped Classical
 
 noncomputable section
 
@@ -207,6 +208,97 @@ theorem tendsto_mul_star_self_sub_of_tendsto_sub {A : Type*} {l : Filter A}
   apply (norm_mul_star_self_sub_le (u a) (v a)).trans
   apply mul_le_mul_of_nonneg_left _ (norm_nonneg _)
   linarith
+
+/-- Complete mass of all pairs representing the same point. -/
+def pointCollisionMass {I X : Type*} (rho : I -> X) (c : X -> Complex) : Real := by
+  classical
+  exact tsum (fun p : Prod I I => if rho p.1=rho p.2 then norm (c (rho p.1))^2 else 0)
+
+/-- Full repeated-index correction; distinct indices at one point remain. -/
+def pointRepeatMass {I X : Type*} (rho : I -> X) (c : X -> Complex) : Real := by
+  classical
+  exact tsum (fun p : Prod I I =>
+    if And (Not (p.1=p.2)) (rho p.1=rho p.2) then norm (c (rho p.1))^2 else 0)
+
+/-- Equal-point conjugate coefficient pairs give a real nonnegative mass. -/
+theorem tsum_equalPoint_mul_star_eq_mass {I X : Type*} (rho : I -> X) (c : X -> Complex) :
+    tsum (fun p : Prod I I => if rho p.1=rho p.2 then c (rho p.1)*star (c (rho p.2)) else 0) =
+      (pointCollisionMass rho c : Complex) := by
+  classical
+  unfold pointCollisionMass
+  rw [Complex.ofReal_tsum]
+  apply tsum_congr
+  intro p
+  by_cases h : rho p.1=rho p.2
+  next =>
+    simp only [h, Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq, ite_true]
+  next =>
+    simp only [if_neg h, Complex.ofReal_zero]
+
+/-- The complete repeated-index correction is nonnegative. -/
+theorem pointRepeatMass_nonneg {I X : Type*} (rho : I -> X) (c : X -> Complex) :
+    0 <= pointRepeatMass rho c := by
+  classical
+  apply tsum_nonneg
+  intro p
+  split_ifs
+  next => exact sq_nonneg _
+  next => exact le_rfl
+
+/-- The complete collision mass splits exactly into its diagonal and the
+nonnegative repeated-index correction. No simple-point assumption is used. -/
+theorem pointCollisionMass_eq_diagonal_add_repeat {I X : Type*}
+    (rho : I -> X) (c : X -> Complex)
+    (hC : Summable (fun i => norm (c (rho i)))) :
+    pointCollisionMass rho c =
+      tsum (fun i => norm (c (rho i))^2) + pointRepeatMass rho c := by
+  classical
+  let b : Prod I I -> Real := fun p => if rho p.1=rho p.2 then norm (c (rho p.1))^2 else 0
+  let d : Prod I I -> Real := fun p => if p.1=p.2 then norm (c (rho p.1))^2 else 0
+  let r : Prod I I -> Real := fun p =>
+    if And (Not (p.1=p.2)) (rho p.1=rho p.2) then norm (c (rho p.1))^2 else 0
+  have hProd : Summable (fun p : Prod I I => norm (c (rho p.1))*norm (c (rho p.2))) :=
+    hC.mul_of_nonneg hC (fun i => norm_nonneg _) (fun i => norm_nonneg _)
+  have hBNonneg (p : Prod I I) : 0 <= b p := by
+    dsimp only [b]
+    split_ifs <;> positivity
+  have hB : Summable b := by
+    apply Summable.of_nonneg_of_le hBNonneg _ hProd
+    intro p
+    by_cases hp : rho p.1=rho p.2
+    next =>
+      simp only [b, if_pos hp, hp, pow_two, le_refl]
+    next =>
+      simp only [b, if_neg hp]
+      positivity
+  have hD : Summable d := by
+    apply Summable.of_nonneg_of_le (fun p => by dsimp only [d]; split_ifs <;> positivity) _ hB
+    intro p
+    by_cases hp : p.1=p.2
+    next =>
+      simp only [d, b, if_pos hp, hp, ite_true, le_refl]
+    next =>
+      simpa only [d, if_neg hp] using hBNonneg p
+  have hR : Summable r := by
+    apply Summable.of_nonneg_of_le (fun p => by dsimp only [r]; split_ifs <;> positivity) _ hB
+    intro p
+    by_cases hp : And (Not (p.1=p.2)) (rho p.1=rho p.2)
+    next =>
+      simp only [r, b, if_pos hp, if_pos hp.2, le_refl]
+    next =>
+      simpa only [r, if_neg hp] using hBNonneg p
+  have hSplit : b = fun p => d p+r p := by
+    funext p
+    by_cases hp : p.1=p.2
+    next => simp [b, d, r, hp]
+    next => simp [b, d, r, hp]
+  change tsum b = tsum (fun i => norm (c (rho i))^2) + tsum r
+  rw [hSplit, hD.tsum_add hR]
+  congr 1
+  rw [hD.tsum_prod]
+  apply tsum_congr
+  intro i
+  simp [d]
 
 end
 

@@ -172,6 +172,48 @@ theorem tsum_norm_real_div_mul_sub_le_sqrt_of_re_eq_half
         (Real.sqrt_nonneg _) (Real.sqrt_nonneg _)
     _ = _ := by rw [Real.sqrt_mul (tsum_nonneg (fun _ => sq_nonneg _))]
 
+/-- Exact squared two-pole coefficient as a difference of inverse-square
+masses. The strict center hypothesis avoids the removable a=1 quotient. -/
+theorem norm_real_div_mul_sub_sq_eq_of_re_eq_half
+    {z : Complex} {a : Real} (ha : 1 < a) (hz : z.re=1/2) :
+    norm ((a : Complex)/(z*((a : Complex)-z)))^2 =
+      a/(a-1)*((Inv.inv (norm z))^2-(Inv.inv (norm ((a : Complex)-z)))^2) := by
+  have hZ : Not (z=0) := by
+    intro h
+    rw [h, Complex.zero_re] at hz
+    norm_num at hz
+  have hAZ : Not ((a : Complex)-z=0) := by
+    intro h
+    have hr := congrArg Complex.re h
+    simp only [Complex.sub_re, Complex.ofReal_re, Complex.zero_re, hz] at hr
+    linarith
+  have hNormZ : Not (norm z=0) := norm_ne_zero_iff.mpr hZ
+  have hNormAZ : Not (norm ((a : Complex)-z)=0) := norm_ne_zero_iff.mpr hAZ
+  have hA : Not (a-1=0) := by linarith
+  have hShift : norm ((a : Complex)-z)^2 = norm z^2+a*(a-1) := by
+    rw [<- Complex.normSq_eq_norm_sq, <- Complex.normSq_eq_norm_sq]
+    simp only [Complex.normSq_apply, Complex.sub_re, Complex.ofReal_re,
+      Complex.sub_im, Complex.ofReal_im, hz]
+    ring
+  rw [norm_div, norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (by linarith : 0 < a)]
+  simp only [div_pow, mul_pow, inv_pow]
+  field_simp [hNormZ, hNormAZ, hA]
+  rw [hShift]
+  ring
+
+/-- The complete diagonal coefficient mass is exactly the difference
+between the unshifted and shifted inverse-square masses. -/
+theorem tsum_norm_real_div_mul_sub_sq_eq_of_re_eq_half
+    {I : Type*} (rho : I -> Complex) (hRe : forall i, (rho i).re=1/2)
+    (hZ : Summable (fun i => (Inv.inv (norm (rho i)))^2))
+    {a : Real} (ha : 1 < a) :
+    tsum (fun i => norm ((a : Complex)/(rho i*((a : Complex)-rho i)))^2) =
+      a/(a-1)*(tsum (fun i => (Inv.inv (norm (rho i)))^2) -
+        tsum (fun i => (Inv.inv (norm ((a : Complex)-rho i)))^2)) := by
+  have hShift := summable_inv_norm_real_sub_sq_of_re_eq_half rho hRe hZ ha.le
+  simp only [norm_real_div_mul_sub_sq_eq_of_re_eq_half ha (hRe _)]
+  rw [tsum_mul_left, hZ.tsum_sub hShift]
+
 end
 
 end Complex
