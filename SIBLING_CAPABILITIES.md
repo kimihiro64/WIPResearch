@@ -70,3 +70,40 @@ Update this catalog when a direct child is added or retired, a capability is
 renamed or upstreamed, a reviewed revision/toolchain changes, or a new
 candidate inventory becomes publicly available. Keep claims declaration-level
 and status-qualified; do not publish private obligations or speculative work.
+
+## Additional pinned analytic dependency
+
+The following external dependency is not a child of this repository template.
+
+| Repository | Pinned commit | Source toolchain | Local compatibility |
+| --- | --- | --- | --- |
+| [anthropics/formal-math](https://github.com/anthropics/formal-math), subdirectory `zeta23` | `fbdc36bbf17d20af3fd0447c6d1a8a02773c9844` | Lean `v4.33.0-rc2`; Mathlib `51e6992efd06126df61a496bebf8f49482a4e129` | Explicit-formula closure builds on this project's unchanged Lean `v4.33.1` and Mathlib `0df444a360eaa60ab8c11dca51a86af692955474` |
+
+Reusable declaration:
+`Zeta23.WeilEF.EF_lit_zetaZeroConfig`, owned by
+`zeta23/Zeta23/WeilEF/Main.lean`. It proves the literature-form Weil
+explicit formula for every twice continuously differentiable, compactly
+supported complex test function, over the actual nontrivial zeros of
+Mathlib's zeta function with analytic multiplicities. The conclusion includes
+absolute summability. It does not assume RH or a zero-density estimate.
+
+Local verification on 2026-09-12: focused dependency build, separate exact
+axiom audit of this declaration and `Zeta23.zetaSeam`, and full project build
+passed. Each audited declaration uses exactly `propext`,
+`Classical.choice`, and `Quot.sound`. No source changes were needed in the
+dependency. Existing dependency records and the project toolchain were
+preserved. This is a declaration-level audit, not a claim that all results
+in the external repository have been audited here.
+
+Joint-import limitation: the separately verified square-interval consumer
+`RobinBV.Sieve.prime_count_ge_square_interval_explicit_formula` is available
+through `RobinBV.Sieve.Proof.SquareIntervalExplicitFormula`, not the existing
+`RobinBV` root. Importing it together with that root currently fails because
+`Zeta23.FromPNTPlus.StrongPNTPrefix` and
+`PrimeNumberTheoremAnd.StrongPNT` both declare `BlaschkeB`. Standalone builds
+and exact axiom audits pass; they do not establish namespace coexistence.
+The root's previous imports and both dependency sources remain unchanged.
+
+The source is copyright 2026 Anthropic, PBC, under Apache-2.0; the original
+notices and repository licence remain in the pinned dependency. No declaration
+was renamed or copied into the project candidate layer.
