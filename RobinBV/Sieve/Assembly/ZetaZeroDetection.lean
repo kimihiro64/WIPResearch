@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
 import RobinBV.Mathlib.Analysis.Complex.DirichletSegment
+import RobinBV.Mathlib.Analysis.Complex.LogPhaseCorrelation
 import RobinBV.Mathlib.NumberTheory.LSeries.UnitCoefficients
 import RobinBV.Sieve.Proof.ZetaEulerMaclaurin
 
@@ -105,5 +106,80 @@ theorem nontrivial_zero_unit_coefficient_detection :
     have hT1 : 1 <= T := (le_max_left _ _).trans hOld
     exact LSeries.dirichlet_sum_height_or_unit_moebius_large
       hC.1 hb hba heta ha hbSmall hT (by linarith) (hC.2 T s hT1 hs hsig ht0 ht1)
+
+theorem short_dirichlet_cpow_first_derivative_bound
+    (N N' : Nat) (t alpha : Real)
+    (hN : 1 <= N) (hNN' : N <= N') (ht : 0 < t)
+    (htM : t <= 2 * ((N : Real) + 1 + alpha))
+    (halpha : 0 <= alpha) (halpha1 : alpha <= 1) :
+    norm (Finset.sum (Finset.range (N' - N)) (fun j =>
+      Complex.ofReal ((N : Real) + 1 + alpha + (j : Real)) ^
+        (-Complex.I * Complex.ofReal t))) <=
+      3 * Real.pi * ((N' : Real) + 2) / t := by
+  let M : Real := (N : Real) + 1 + alpha
+  let s : Complex := Complex.I * Complex.ofReal t
+  have hM : 0 < M := by
+    dsimp [M]
+    positivity
+  have hst : 0 < abs s.im := by
+    dsimp [s]
+    simpa [abs_of_pos ht] using ht
+  have hstM : abs s.im <= 2 * M := by
+    dsimp [s, M]
+    simp only [Complex.mul_im, Complex.I_re, Complex.I_im, Complex.ofReal_re,
+      Complex.ofReal_im, zero_mul, one_mul]
+    simp [abs_of_pos ht]
+    exact htM
+  have hsigma : 0 <= s.re := by
+    dsimp [s]
+    simp
+  have hraw := Complex.norm_sum_cpow_le_of_large_start
+    (M := M) (s := s) hM hst hstM hsigma (N' - N)
+  have hMK : M + ((N' - N : Nat) : Real) <= (N' : Real) + 2 := by
+    dsimp [M]
+    have hNreal : (N : Real) <= (N' : Real) := by
+      exact_mod_cast hNN'
+    have hsub : ((N' - N : Nat) : Real) = (N' : Real) - (N : Real) := by
+      rw [Nat.cast_sub hNN']
+    rw [hsub]
+    linarith
+  have hraw' :
+      norm (Finset.sum (Finset.range (N' - N)) (fun j =>
+        Complex.ofReal (M + (j : Real)) ^ (-s))) <=
+        3 * Real.pi * ((N' : Real) + 2) / t := by
+    calc
+      _ <= 3 * Real.pi * (M + ((N' - N : Nat) : Real)) /
+          abs s.im * M ^ (-s.re) := hraw
+      _ = 3 * Real.pi * (M + ((N' - N : Nat) : Real)) / t := by
+        dsimp [s]
+        simp [abs_of_pos ht]
+      _ <= 3 * Real.pi * ((N' : Real) + 2) / t := by
+        refine div_le_div_of_nonneg_right ?_ (le_of_lt ht)
+        have hpi : 0 <= (3 : Real) * Real.pi := by positivity
+        have hleft : 0 <= M + ((N' - N : Nat) : Real) := by positivity
+        nlinarith [hMK]
+  simpa [M, s, neg_mul] using hraw'
+
+theorem short_dirichlet_typeI_cpow_bound
+    (N N' : Nat) (t : Real)
+    (hN : 1 <= N) (hNN' : N <= N') (ht : 0 < t)
+    (htM : t <= 2 * ((N : Real) + 1)) :
+    norm (Finset.sum (Finset.range (N' - N)) (fun j =>
+      ((N + j + 1 : Nat) : Complex) ^
+        (-Complex.I * Complex.ofReal t))) <=
+      3 * Real.pi * ((N' : Real) + 2) / t := by
+  have hmain := short_dirichlet_cpow_first_derivative_bound
+    N N' t 0 hN hNN' ht (by simpa using htM) (by norm_num) (by norm_num)
+  simpa [Nat.cast_add, Nat.cast_one, add_assoc, add_comm, add_left_comm] using hmain
+
+theorem short_dirichlet_log_typeII_correlation_bound
+    (Y P : Real) (N h : Nat)
+    (hY : 0 < Y) (hP : 0 < P) (hh : 0 < h)
+    (hsmall : Y * (h : Real) <= Real.pi * P^2) :
+    norm ((Finset.range N).sum (fun j =>
+      Complex.exp (Complex.I * ((-Y *
+        (Real.log (P + j + h) - Real.log (P + j)) : Real) : Complex)))) <=
+        3 * Real.pi * (P + N + h + 1)^2 / (Y * h) := by
+  exact Complex.norm_sum_exp_log_difference_le Y P N h hY hP hh hsmall
 
 end RobinBV.Sieve

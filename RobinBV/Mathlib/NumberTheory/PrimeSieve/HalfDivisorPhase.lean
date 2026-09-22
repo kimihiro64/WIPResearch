@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Half-divisor phase estimates
+
+This module supplies the half-divisor phase inequalities used in the owner
+packet and square-interval sieve calculations.
+-/
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.GCongr

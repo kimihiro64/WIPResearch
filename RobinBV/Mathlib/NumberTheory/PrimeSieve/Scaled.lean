@@ -1,4 +1,11 @@
 /-
+# Scaled least-prime owner packets
+
+This module transports least-prime ownership to scaled square-interval
+packets while retaining endpoint and repeated-power corrections.
+-/
+
+/-
 Copyright (c) 2026 Jonas Whidden.
 Ported from robin commit b6a7dff5f9546131cf668a9c8bfa436f4650bc0d.
 Authors: Jonas Whidden
@@ -20,7 +27,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
--/
+ -/
 
 import RobinBV.Mathlib.NumberTheory.PrimeSieve.Owner
 

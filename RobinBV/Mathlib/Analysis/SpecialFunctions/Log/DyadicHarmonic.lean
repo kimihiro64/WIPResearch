@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Dyadic harmonic logarithm bounds
+
+This module gives explicit logarithmic estimates for harmonic sums on dyadic
+blocks.
+-/
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Analysis.SumIntegralComparisons
 import Mathlib.Tactic.FieldSimp

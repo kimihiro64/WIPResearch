@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Fifth-incidence square-interval packets
+
+This module counts the fifth-power incidence configurations used by the
+owner-band refinements of the square-interval sieve.
+-/
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Finset.Card
 import Mathlib.Data.Nat.Choose.Basic

@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Prime-sieve facade
+
+This facade exports the square-interval owner, density, and weighted sieve
+modules used throughout the Legendre project.
+-/
 import RobinBV.Mathlib.NumberTheory.PrimeSieve.SquareIntervalBandCoverage
 import RobinBV.Mathlib.NumberTheory.PrimeSieve.SquareIntervalEvenEndpoint
 import RobinBV.Mathlib.NumberTheory.PrimeSieve.SquareIntervalFifthOptimization

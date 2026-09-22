@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Shifted inverse-square bounds
+
+This module supplies explicit real and complex estimates for shifted inverse
+squares and their finite or summable tails.
+-/
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 import Mathlib.Analysis.Real.Sqrt

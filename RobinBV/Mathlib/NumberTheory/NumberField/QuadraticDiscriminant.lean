@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas
 -/
+/-
+# Quadratic discriminant identities
+
+This module records the elementary discriminant and squarefree identities
+needed for quadratic number-field bookkeeping.
+-/
 module
 
 import Mathlib.Data.Rat.Lemmas

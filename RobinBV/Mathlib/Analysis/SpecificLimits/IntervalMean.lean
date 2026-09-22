@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Interval mean limits
+
+This module contains interval-average limit estimates for locally integrable
+functions and their floor-based discretizations.
+-/
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.MeasureTheory.Function.Floor

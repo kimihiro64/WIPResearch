@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Reciprocal shift identities
+
+This module records finite reciprocal-shift estimates for complex analytic
+expressions used by the later zero and moment bounds.
+-/
 import Mathlib.Algebra.BigOperators.Module
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 import Mathlib.Tactic.FieldSimp

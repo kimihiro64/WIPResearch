@@ -1,4 +1,11 @@
 /-
+# Finite least-prime ownership
+
+This module gives the disjoint least-prime-owner decomposition for finite
+intervals, including arbitrary weights and prime powers.
+-/
+
+/-
 Copyright (c) 2026 Jonas Whidden.
 Ported from robin commit b6a7dff5f9546131cf668a9c8bfa436f4650bc0d.
 Authors: Jonas Whidden
@@ -20,7 +27,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
--/
+ -/
 
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Nat.Prime.Basic

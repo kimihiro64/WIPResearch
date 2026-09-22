@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Local zeta energy packets
+
+This module packages the local zero-energy estimates consumed by the
+almost-all square-interval argument.
+-/
 import Mathlib.Data.Int.Interval
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
@@ -128,6 +134,23 @@ theorem zeta_zero_mass_log_bound :
   intro T hT A hA hh
   exact zero_mass_of_local_count
     (by linarith [h.choose_spec.1] : 0 <= h.choose) h.choose_spec.2 hT A hA hh
+
+theorem zeta_zero_mass_positive_band_log_bound :
+    Exists fun C : Real => 1 <= C /\
+      forall L U : Real, 0 <= L -> 1 <= U ->
+      forall A : Finset Complex,
+      (forall rho, (A : Set Complex) rho -> Zeta23.IsNontrivialZero rho) ->
+      (forall rho, (A : Set Complex) rho -> L < rho.im /\ rho.im < U) ->
+      Finset.sum A (fun rho => (Zeta23.zeroMult rho : Real)) <=
+        C*(2*U+3)*Real.log (U+5) := by
+  obtain h := zeta_zero_mass_log_bound
+  refine Exists.intro h.choose (And.intro h.choose_spec.1 ?_)
+  intro L U hL hU A hA hband
+  apply h.choose_spec.2 U hU A hA
+  intro rho hrho
+  have hb := hband rho hrho
+  rw [abs_of_pos (lt_of_le_of_lt hL hb.1)]
+  linarith [hb.2]
 
 
 private theorem zero_row_of_local_count {C T c : Real} (hC : 0 <= C)

@@ -1,7 +1,13 @@
-import RobinBV.Mathlib.Analysis.Complex.DirichletSegment
-import RobinBV.Mathlib.Analysis.Complex.FourierBounds
-import RobinBV.Mathlib.Analysis.Complex.LogDerivContinuation
-import RobinBV.Mathlib.Analysis.Complex.ShiftedInverseSquare
+/-
+# RobinBV Mathlib facade
+
+This facade exports the project-local analytic and arithmetic modules used by
+the sieve and prime-interval developments.
+-/
+
+import RobinBV.Mathlib.Analysis.Complex.Core
+import RobinBV.Mathlib.Analysis.Complex.LinnikVMVT
+import RobinBV.Mathlib.Analysis.Complex.LogPhase
 import RobinBV.Mathlib.Analysis.MellinTail
 import RobinBV.Mathlib.Analysis.SpecificLimits.IntervalMeanOscillation
 import RobinBV.Mathlib.MeasureTheory.Integral.TailSwap

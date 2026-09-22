@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas Whidden. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas Whidden
 -/
+/-
+# Prime-power corrections for characters
+
+This module isolates the explicit prime-power correction terms appearing in
+Dirichlet-character and von Mangoldt decompositions.
+-/
 import Mathlib.NumberTheory.ArithmeticFunction.VonMangoldt
 import Mathlib.NumberTheory.DirichletCharacter.Bounds
 import Mathlib.RingTheory.Coprime.Lemmas

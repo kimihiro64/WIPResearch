@@ -3,6 +3,12 @@ Copyright (c) 2026 Jonas. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonas
 -/
+/-
+# Quadratic character conventions
+
+This module defines the quadratic character data used by the number-field
+factorization and zeta-splitting developments.
+-/
 module
 
 public import Mathlib.Data.Nat.Squarefree
