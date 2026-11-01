@@ -183,7 +183,7 @@ jobs:
       - name: Fetch dependencies
         run: lake update
       - name: Restore the completed Lean build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: linux-lean-build
           path: .lake/build
@@ -222,7 +222,7 @@ jobs:
       - name: Fetch dependencies
         run: lake update
       - name: Restore the completed Lean build
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: linux-lean-build
           path: .lake/build
@@ -394,19 +394,19 @@ jobs:
           echo "draft_id=" >> "$GITHUB_OUTPUT"
       - name: Download the research paper
         if: steps.release_state.outputs.complete != 'true'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: research-paper
           path: release-inputs/paper
       - name: Download the completed Lean build
         if: steps.release_state.outputs.complete != 'true'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: linux-lean-build
           path: release-inputs/linux-build
       - name: Download the API documentation
         if: steps.release_state.outputs.complete != 'true'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: api-documentation
           path: release-inputs/api-documentation
